@@ -1,0 +1,96 @@
+---
+title: "HTN HTE Analysis Part 1"
+author: "Jingzhi Kevin Yu"
+date: "4/10/24"
+output: html_document
+---
+
+# STEP 0A: Extract Data from Database
+
+```{r}
+if (!require(DatabaseConnector))
+{
+  install.packages("DatabaseConnector")
+}
+if (!require(DatabaseConnector))
+{
+  install.packages("SqlRender")
+}
+if (!require(DatabaseConnector))
+{
+  install.packages("RSQLite")
+}
+
+library(DatabaseConnector)
+library(SqlRender)
+library(RSQLite)
+library(tidyverse)
+
+path = getwd()
+```
+
+## SQL Connection
+INSTRUCTIONS:
+1. Select SQL type 
+2. Edit SQL log-on info
+```{r}
+# select SQL type
+sql_flavor = 'sqlite'
+
+if (sql_flavor == 'ms-sql')
+{
+  Sys.setenv("DATABASECONNECTOR_JAR_FOLDER" = "c:/Development")
+  downloadJdbcDrivers("sql server")
+  
+  connectionDetails = createConnectionDetails(
+    dbms = "sql server",
+    server = Sys.getenv("HTE_HTN_DB_SERVER"),
+    user = Sys.getenv("HTE_HTN_DB_USER"),
+    password = Sys.getenv("HTE_HTN_DB_PASSWORD"),
+    pathToDriver="C:/Development"
+  )
+  conn = connect(connectionDetails)
+} else if (sql_flavor == 'sqlite')
+{ 
+  conn = connect(dbms = "sqlite", server = '/Users/excenity/Documents/HSIP/Research/Dissertation Project/Data/EDW OMOP.db')
+  cdmDbSchema = 'main'
+}
+
+output_analytical_dataset = F
+```
+
+## Query Code
+```{r}
+if (sql_flavor == 'ms-sql')
+{
+  source('STEP0A_DatasetCreation_MSSQL.r')
+} else if (sql_flavor == 'sqlite')
+{
+  source('STEP0A_DatasetCreation_SQlite.r')
+}
+```
+
+# STEP 0B: Analytic Dataset Creation
+
+## Run Data Wrangling Code
+```{r}
+source('STEP0B_dataset_creation_script.R')
+
+if (output_analytical_dataset == T)
+{
+  write.csv(final_df, 'final_df.csv', row.names = F)  
+}
+```
+
+
+-- Statistical Analysis -- 
+
+# STEP 1: Individual Treatment Effects (ITE) Estimation via G-estimation
+```{r}
+source('STEP1_ITE_estimation.R')
+```
+
+# STEP 2: 
+```{r}
+
+```
