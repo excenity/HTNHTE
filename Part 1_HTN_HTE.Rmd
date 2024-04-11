@@ -6,7 +6,6 @@ output: html_document
 ---
 
 # STEP 0A: Extract Data from Database
-
 ```{r}
 if (!require(DatabaseConnector))
 {
@@ -56,6 +55,7 @@ if (sql_flavor == 'ms-sql')
   cdmDbSchema = 'main'
 }
 
+# whether to export analytic dataset for future analysis
 output_analytical_dataset = F
 ```
 
@@ -90,7 +90,7 @@ if (output_analytical_dataset == T)
 source('STEP1_ITE_estimation.R')
 ```
 
-# STEP 2: 
+# STEP 2: Causal Forest to Identify Factors Contributing Most to Heterogeneity
 ```{r}
-
+source('STEP2_CF_HTE.R')
 ```
