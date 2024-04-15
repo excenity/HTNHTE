@@ -23,13 +23,18 @@ library(Metrics)
 # create results folder
 dir.create(file.path(path, 'results/step1_ITE_estimation'))
 
+
 ## ---- Data Prep
-#final_df = read.csv('/Users/excenity/Documents/HSIP/Research/Dissertation Project/Code/HTN HTE Testing/final_df.csv')
-df = final_df
 
 if (output_analytical_dataset == T)
 {
-  remove(final_df)  
+  final_df = fread(file.path(path, 'final_df.csv'))
+  df = final_df
+  remove(final_df)
+} else
+{
+  df = final_df
+  remove(final_df)
 }
 
 
