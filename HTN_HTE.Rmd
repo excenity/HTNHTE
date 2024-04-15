@@ -1,7 +1,7 @@
 ---
-title: "HTN HTE Analysis Part 1"
+title: "HTN HTE Analysis"
 author: "Jingzhi Kevin Yu"
-date: "4/10/24"
+date: "4/15/24"
 output: html_document
 ---
 
@@ -85,6 +85,8 @@ if (output_analytical_dataset == T)
 
 -- Statistical Analysis -- 
 
+## PART 1: Explore patient characteristics that contribute to HTE
+
 # STEP 1: Individual Treatment Effects (ITE) Estimation via G-estimation
 ```{r}
 source('STEP1_ITE_estimation.R')
@@ -93,4 +95,24 @@ source('STEP1_ITE_estimation.R')
 # STEP 2: Causal Forest to Identify Factors Contributing Most to Heterogeneity
 ```{r}
 source('STEP2_CF_HTE.R')
+```
+
+## -- STOP HERE AND REVIEW RESULTS -- ## 
+
+## Part 2: Use targeted estimation to determine treatment effects of BP medications
+
+# STEP 3: Targeted Maximum Likelihood Estimation (TMLE) of Medication Treatment Effects within Different Patient Populations
+```{r}
+# input variables of importance used for creating patient profiles
+cont_var = c('age', 'SBP', 'DBP', 'BMI', 'total_cholesterol', 'creatinine')
+
+# input cutoffs of variables used for creating patient profiles 
+cutpoints = list(c(0, 65, 150), 
+                 c(0 ,150, 250), 
+                 c(0, 90, 200), 
+                 c(0, 30, 100), 
+                 c(0, 200, 300), 
+                 c(0, 0.95, 5))
+
+source('STEP3_TMLE_HTE.R')
 ```
