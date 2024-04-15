@@ -174,7 +174,7 @@ step1_ite_SL = function(med_class_i, df, outcome, months = 6)
   for (i in 1:5)
 {
   ite = step1_ite_SL(i, df, 'at_control')  
-  write.csv(ite, file.path(path, paste0('results/step1_ITE_estimation/ite_at_control_', htn_med_list[i], '.csv')), row.names = F)
+  write.csv(ite, file.path(path, paste0('results/step1_ITE_estimation/ITE_at_control_', htn_med_list[i], '.csv')), row.names = F)
   ite = step1_ite_SL(i, df, 'SBP_change')  
-  write.csv(ite, file.path(path, paste0('results/step1_ITE_estimation/SBP_change_', htn_med_list[i], '.csv')), row.names = F)
+  write.csv(ite, file.path(path, paste0('results/step1_ITE_estimation/ITE_SBP_change_', htn_med_list[i], '.csv')), row.names = F)
 }

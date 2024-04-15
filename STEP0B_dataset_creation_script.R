@@ -306,9 +306,9 @@ final_df[,c('gender', 'race', 'ethnicity', 'htn_med_class', 'HF', 'T2DM', "CKD",
 
 # all data
 final_df_tab = final_df %>% select(c('htn_med_class','age', 'gender', 'race', 'ethnicity', 'HF', 'T2DM', 'CKD', 'Sleep_Apnea',"antidepressants", 
-                                     "hormonal_therapy", "statins", "PPI", "SBP", "DBP", 'BMI', 'total_cholesterol', 'creatinine', 'control_6months', 'SBP_diff_6months')) 
+                                     "hormonal_therapy", "statins", "PPI", "SBP", "DBP", 'BMI', 'total_cholesterol', 'creatinine', 'hba1c', 'control_6months', 'SBP_diff_6months')) 
 tab_cat_vars = c('gender',' race', 'ethnicity', 'HF', 'T2DM', 'CKD', 'Sleep_Apnea',"antidepressants", "hormonal_therapy", "statins", "PPI", 'control_6months')
-tab_vars = c('age', 'gender', 'race', 'ethnicity','HF', 'T2DM', 'CKD', 'Sleep_Apnea',"antidepressants", "hormonal_therapy", "statins", "PPI", "SBP", "DBP", 'BMI', 'total_cholesterol', 'creatinine', 'control_6months', 'SBP_diff_6months')
+tab_vars = c('age', 'gender', 'race', 'ethnicity','HF', 'T2DM', 'CKD', 'Sleep_Apnea',"antidepressants", "hormonal_therapy", "statins", "PPI", "SBP", "DBP", 'BMI', 'total_cholesterol', 'creatinine', 'hba1c', 'control_6months', 'SBP_diff_6months')
 table1 = CreateTableOne(data = final_df_tab, strata = 'htn_med_class', test = F, vars = tab_vars, factorVars = tab_cat_vars, addOverall = T)
 
 table1 = print(table1, smd = T)

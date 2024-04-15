@@ -31,10 +31,10 @@ CF_analysis = function(outcome, htn_med_class_i)
 {
   if (outcome == 'at_control')
   {
-    ite = fread(file.path(path, paste0('results/step1_ITE_estimation/ite_at_control_', htn_med_class_i, '.csv')), col.names = c('person_id', 'ite'))
+    ite = fread(file.path(path, paste0('results/step1_ITE_estimation/ITE_at_control_', htn_med_class_i, '.csv')), col.names = c('person_id', 'ite'))
   } else if (outcome == 'sbp_change')
     {
-      ite = fread(file.path(path, paste0('results/step1_ITE_estimation/SBP_change_', htn_med_class_i, '.csv')), col.names = c('person_id', 'ite'))
+      ite = fread(file.path(path, paste0('results/step1_ITE_estimation/ITE_SBP_change_', htn_med_class_i, '.csv')), col.names = c('person_id', 'ite'))
   }
   
   ## Dataset Setup
