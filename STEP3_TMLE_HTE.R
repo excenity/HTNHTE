@@ -132,15 +132,14 @@ TMLE_analysis = function(outcome)
       names(EIF_df)[1] = 'Y'
       
       EIF_df$EIF = (EIF_df$Y - EIF_df$q_init) * EIF_df$A / EIF_df$g_score + EIF_df$q_init - EIF_df$q_star_avg
+      EIF_std = sqrt(var(EIF_df$EIF)/nrow(EIF_df))
       
+      # combine TMLE results 
       if (is.null(tmle_fit$estimates$ATE$psi))
       {
         tmle_fit$estimates$ATE$psi = 0
       }
       
-      EIF_std = sqrt(var(EIF_df$EIF)/nrow(EIF_df))
-      
-      # combine TMLE results 
       tmle_results = data.frame(
         Q1_star_avg = q_star_avg, 
         EIF_std = EIF_std, 
@@ -182,8 +181,9 @@ print('Running SBP_change Analysis')
 TMLE_analysis(outcome = 'SBP_change')
 
 
+
+## ---- run TMLE analysis of the negative control variable
 print('Running neg_control Analysis')
-# run TMLE analysis of the negative control variable
 for (med_class_i in 1:length(htn_med_list))
 {
   # create medication class specific dataset
@@ -213,15 +213,14 @@ for (med_class_i in 1:length(htn_med_list))
   names(EIF_df)[1] = 'Y'
   
   EIF_df$EIF = (EIF_df$Y - EIF_df$q_init) * EIF_df$A / EIF_df$g_score + EIF_df$q_init - EIF_df$q_star_avg
+  EIF_std = sqrt(var(EIF_df$EIF)/nrow(EIF_df))
   
+  # combine TMLE results for negative control analysis
   if (is.null(tmle_fit$estimates$ATE$psi))
   {
     tmle_fit$estimates$ATE$psi = 0
   }
   
-  EIF_std = sqrt(var(EIF_df$EIF)/nrow(EIF_df))
-  
-  # combine TMLE results 
   tmle_results = data.frame(
     Q1_star_avg = q_star_avg, 
     EIF_std = EIF_std, 
@@ -237,6 +236,10 @@ for (med_class_i in 1:length(htn_med_list))
   
 write.csv(tmle_results_df, file.path(path, paste0('results/step3_TMLE_analysis/tmle_results_df_bmi_neg.csv')), row.names = F)
 
+# Overview
+TMLE_plot = ggplot(tmle_results_df, aes(x = htn_med_class, y = Q1_star_avg, color = htn_med_class)) + geom_point() + geom_linerange(aes(ymin=Q1_star_lb, ymax=Q1_star_ub)) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + theme_bw() + xlab('Hypertension Medication Class') + ylab('Predicted Treatment Effect')
+ggsave(file.path(path, paste0('results/step3_TMLE_analysis/TMLE_plot_bmiNeg.png')), TMLE_plot, height = 8, width = 12)
 
 
 
