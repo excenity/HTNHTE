@@ -17,11 +17,7 @@ if (output_analytical_dataset == T)
   df = fread(file.path(path, 'final_df.csv'))
 }
 
-df = final_df
-df = df %>% select(-c(drug_exposure_start_date, cohort_start_date, DBP_12months, SBP_12months, DBP_6months, SBP_6months))
-
-# med class list
-htn_med_list = c('acei', 'arb', 'ccb', 'diuretics', 'acei_arb_diuretic')
+final_df$htn_med_class = as.character(final_df$htn_med_class)
 
 dir.create(file.path(path, 'results/step2_CF_analysis'))
 
@@ -29,6 +25,8 @@ dir.create(file.path(path, 'results/step2_CF_analysis'))
 ## ---- CF Helper Function
 CF_analysis = function(outcome, htn_med_class_i)
 {
+  df = final_df
+  
   if (outcome == 'at_control')
   {
     ite = fread(file.path(path, paste0('results/step1_ITE_estimation/ITE_at_control_', htn_med_class_i, '.csv')), col.names = c('person_id', 'ite'))
@@ -39,7 +37,7 @@ CF_analysis = function(outcome, htn_med_class_i)
   
   ## Dataset Setup
   
-  df$htn_med_class[df$htn_med_class != htn_med_class_i ] = 'other'
+  df$htn_med_class[df$htn_med_class != htn_med_class_i] = 'other'
   df$htn_med_class = factor(df$htn_med_class, levels = c('other', htn_med_class_i))
   
   # join dataset

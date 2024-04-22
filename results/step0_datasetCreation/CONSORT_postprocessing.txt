@@ -1,0 +1,6 @@
+[1] 69423
+[1] "N after removing missing treatment assignmend: 61471"
+[1] "N after removing missing baseline BP measurement: 59478"
+[1] "N after removing missing outcome at 6 months: 37682"
+[1] "N after removing those under age 18: 37667"
+[1] "N after not at control at prescription: 31053"

@@ -26,6 +26,9 @@ library(tidyverse)
 
 # get working directory or set your own
 path = getwd()
+
+# medication list
+htn_med_list = c('acei', 'arb', 'ccb', 'diuretics', 'acei_arb_diuretic')
 ```
 
 #### INPUT CHUNK ####
@@ -93,13 +96,13 @@ if (sql_flavor == 'ms-sql')
 # STEP 0B: Analytic Dataset Creation
 
 ## Run Data Wrangling Code
-```{r}
+```{r message=FALSE}
 source('STEP0B_dataset_creation_script.R')
 
 if (output_analytical_dataset == T)
 {
   write.csv(final_df, 'final_df.csv', row.names = F)
-  remove(final_df)
+  write.csv(bmi_neg, 'bmi_neg.csv', row.names = F)
 }
 ```
 
@@ -129,7 +132,7 @@ cont_var = c('age', 'SBP', 'DBP', 'BMI', 'total_cholesterol', 'creatinine')
 
 # input cutoffs of variables used for creating patient profiles 
 cutpoints = list(c(0, 65, 150), 
-                 c(0 ,150, 250), 
+                 c(0 ,150, 300), 
                  c(0, 90, 200), 
                  c(0, 30, 100), 
                  c(0, 200, 300), 

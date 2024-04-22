@@ -30,16 +30,13 @@ if (output_analytical_dataset == T)
 {
   final_df = fread(file.path(path, 'final_df.csv'))
   df = final_df
-  remove(final_df)
+ # remove(final_df)
 } else
 {
   df = final_df
-  remove(final_df)
+  #remove(final_df)
 }
 
-
-# HTN med class list
-htn_med_list = c('acei', 'arb', 'ccb', 'diuretics', 'acei_arb_diuretic')
 
 # list of factors and format dataset
 factor_list = c('gender', 'race', 'ethnicity','HF', 'T2DM', 'CKD', 'Sleep_Apnea',"antidepressants", "hormonal_therapy", "statins", "PPI")
@@ -47,7 +44,7 @@ df = df %>% mutate_at(factor_list, as.factor)
 df$htn_med_class = as.character(df$htn_med_class)
 
 # remove unneeded vars
-df = df %>% select(-c(drug_exposure_start_date, cohort_start_date, DBP_12months, SBP_12months, DBP_6months, SBP_6months))
+#df = df %>% select(-c(drug_exposure_start_date, cohort_start_date, DBP_12months, SBP_12months, DBP_6months, SBP_6months))
 
 ## ---- Estimation via Superlearner
 
@@ -62,6 +59,7 @@ xg.tune = list(ntrees = c(5, 10, 15),
                max_depth = c(3, 5, 8), 
                eta = c(0.05, 0.01))
 xgboost.learners = create.Learner("SL.xgboost", tune = xg.tune, detailed_names = TRUE, name_prefix = "xgb")
+
 
 ## SuperLearner Modeling Function
 step1_ite_SL = function(med_class_i, df, outcome, months = 6)
@@ -78,13 +76,13 @@ step1_ite_SL = function(med_class_i, df, outcome, months = 6)
     if (outcome == 'at_control')
     {
       X = df_comp %>% select(-c(SBP_diff_12months, control_12months, control_6months, SBP_diff_6months)) 
-      y = as.numeric(df_comp$control_12months)
+      y = as.numeric(df_comp$control_12months) - 1
       SL.family = 'binomial'
       SL.method = 'method.AUC'
     } else 
     {
       X = df_comp %>% select(-c(SBP_diff_12months, control_12months, control_6months, SBP_diff_6months)) 
-      y = df_comp$SBP_diff_12months
+      y = df_comp$SBP_diff_12months 
       SL.family = 'gaussian'
       SL.method = 'method.NNLS'
     }
@@ -93,7 +91,7 @@ step1_ite_SL = function(med_class_i, df, outcome, months = 6)
     if (outcome == 'at_control')
     {
       X = df_comp %>% select(-c(SBP_diff_12months, control_12months, control_6months, SBP_diff_6months)) 
-      y = as.numeric(df_comp$control_6months)
+      y = as.numeric(df_comp$control_6months) - 1 
       SL.family = 'binomial'
       SL.method = 'method.AUC'
     } else 
@@ -170,9 +168,9 @@ step1_ite_SL = function(med_class_i, df, outcome, months = 6)
 
 ## Calculate ITE and Output Dataset
 
-#for (i in 1:length(htn_med_list))
-  for (i in 1:5)
+for (i in 1:length(htn_med_list))
 {
+  print(htn_med_list[i])
   ite = step1_ite_SL(i, df, 'at_control')  
   write.csv(ite, file.path(path, paste0('results/step1_ITE_estimation/ITE_at_control_', htn_med_list[i], '.csv')), row.names = F)
   ite = step1_ite_SL(i, df, 'SBP_change')  

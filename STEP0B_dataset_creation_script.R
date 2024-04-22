@@ -220,6 +220,14 @@ bp_12months = bp_latest(bp_12months, 'results/step0_datasetCreation/bp_12m_timed
 bp_12months = rename(bp_12months, DBP_12months = DBP, SBP_12months = SBP)
 
 
+## ---- Negative Control Labs
+bmi_codes = OMOP_codes %>% filter(subtype == 'BMI')
+bmi_neg = labs %>% filter(measurement_concept_id %in% bmi_codes$concept_id)
+
+bmi_neg = bmi_neg %>% filter(measurement_date > cohort_start_date %m+% months(1) & measurement_date <= cohort_start_date %m+% months(3))
+bmi_neg = bmi_neg %>% group_by(person_id) %>% summarise_at(vars(value_as_number), mean, na.rm = T)
+names(bmi_neg)[2] = 'BMI_negControl'
+
 ## ---- Join Datasets
 final_df = left_join(demo, htn_meds_first)
 final_df = left_join(final_df, comorbidities_first)
@@ -227,9 +235,11 @@ final_df = left_join(final_df, concurrent_meds)
 final_df = left_join(final_df, b_labs_min)
 final_df = left_join(final_df, bp_6months)
 final_df = left_join(final_df, bp_12months)
+final_df = left_join(final_df, bmi_neg)
 
 
 ## ---- remove missing records
+sink(file.path(path, 'results/step0_datasetCreation/CONSORT_postprocessing.txt'))
 print(nrow(final_df))
 final_df = final_df %>% filter(!is.na(htn_med_class)) # remove those missing treatment assignment
 print(paste('N after removing missing treatment assignmend:', nrow(final_df)))
@@ -241,6 +251,7 @@ final_df = final_df %>% filter(age > 18)
 print(paste('N after removing those under age 18:', nrow(final_df)))
 final_df = final_df %>% filter(SBP >= 130 | DBP >= 80)
 print(paste('N after not at control at prescription:', nrow(final_df)))
+sink()
 
 final_df = final_df %>% select(-c('LDL')) # check on availability of LDL
 
@@ -250,28 +261,33 @@ png(file.path(path, 'results/step0_datasetCreation/missmap.png'), width = 800, h
 missmap(final_df)
 dev.off()
 
+sink(file.path(path, 'results/step0_datasetCreation/missingness_df.txt'))
+print(colSums(is.na(final_df)))
+sink()
+
 
 ## ---- Bounding Continuous Values and Multiple Imputation
 # Bounding BMI, total cholesterol, and creatinine
-final_df$BMI[final_df$BMI < 12 | final_df$BMI > 80] = NA
+final_df$BMI[final_df$BMI < 12 | final_df$BMI > 100] = NA
+final_df$BMI_negControl[final_df$BMI_negControl < 12 | final_df$BMI_negControl > 100] = NA
 final_df$total_cholesterol[final_df$total_cholesterol < 100 | final_df$total_cholesterol > 300] = NA
 final_df$creatinine[final_df$creatinine < 0.5  | final_df$creatinine > 5] = NA
 
 # normalize variables
-norm_vars = c('BMI', 'total_cholesterol', 'creatinine')
+norm_vars = c('BMI', 'total_cholesterol', 'creatinine', 'BMI_negControl')
 norm_process = preProcess(final_df %>% select(norm_vars), method = 'range')
 norm_df = predict(norm_process, final_df %>% select(norm_vars))
 final_df[, norm_vars] = norm_df
 
 # multiple imputation
-mice_df = mice(final_df %>% select(-c(person_id, drug_exposure_start_date, cohort_start_date)), m = 1, maxit = 1000, method = 'pmm', seed = 618, verbose = F)
+mice_df = mice(final_df %>% select(-c(person_id, drug_exposure_start_date, cohort_start_date)), m = 1, maxit = 50, method = 'pmm', seed = 618, verbose = F)
 png(file.path(path, 'results/step0_datasetCreation/imputation.png'), width = 800, height = 600)
 densityplot(mice_df)
 dev.off()
 
-# rescale
 norm_df = complete(mice_df) %>% select(norm_vars)
 
+# rescale
 ranges = norm_process$ranges[2,] - norm_process$ranges[1,]
 for (i in 1:length(ranges))
 {
@@ -296,20 +312,31 @@ final_df$control_12months[final_df$SBP_12months <= 130 & final_df$DBP_12months <
 # secondary outcome
 final_df$SBP_diff_12months = final_df$SBP_12months - final_df$SBP
 final_df$SBP_diff_6months = final_df$SBP_6months - final_df$SBP
-
-
+final_df$BMI_negControl = final_df$BMI_negControl - final_df$BMI
+  
 ## ---- Final Analytic Dataset
-final_df[,c('gender', 'race', 'ethnicity', 'htn_med_class', 'HF', 'T2DM', "CKD", "Sleep_Apnea", "antidepressants", "hormonal_therapy",
-            "statins", "PPI", "control_6months", "control_12months")] =
-  lapply(final_df[,c('gender', 'race', 'ethnicity', 'htn_med_class', 'HF', 'T2DM', "CKD", "Sleep_Apnea", "antidepressants", "hormonal_therapy",
-                     "statins", "PPI", "control_6months", "control_12months")], factor)
+# final_df[,c('gender', 'race', 'ethnicity', 'htn_med_class', 'HF', 'T2DM', "CKD", "Sleep_Apnea", "antidepressants", "hormonal_therapy",
+#             "statins", "PPI", "control_6months", "control_12months")] =
+#   lapply(final_df[,c('gender', 'race', 'ethnicity', 'htn_med_class', 'HF', 'T2DM', "CKD", "Sleep_Apnea", "antidepressants", "hormonal_therapy",
+#                      "statins", "PPI", "control_6months", "control_12months")], factor)
 
 # all data
-final_df_tab = final_df %>% select(c('htn_med_class','age', 'gender', 'race', 'ethnicity', 'HF', 'T2DM', 'CKD', 'Sleep_Apnea',"antidepressants", 
-                                     "hormonal_therapy", "statins", "PPI", "SBP", "DBP", 'BMI', 'total_cholesterol', 'creatinine', 'hba1c', 'control_6months', 'SBP_diff_6months')) 
-tab_cat_vars = c('gender',' race', 'ethnicity', 'HF', 'T2DM', 'CKD', 'Sleep_Apnea',"antidepressants", "hormonal_therapy", "statins", "PPI", 'control_6months')
-tab_vars = c('age', 'gender', 'race', 'ethnicity','HF', 'T2DM', 'CKD', 'Sleep_Apnea',"antidepressants", "hormonal_therapy", "statins", "PPI", "SBP", "DBP", 'BMI', 'total_cholesterol', 'creatinine', 'hba1c', 'control_6months', 'SBP_diff_6months')
-table1 = CreateTableOne(data = final_df_tab, strata = 'htn_med_class', test = F, vars = tab_vars, factorVars = tab_cat_vars, addOverall = T)
-
+final_df = final_df %>% select(c('person_id', 'htn_med_class','age', 'gender', 'race', 'ethnicity', 'HF', 'T2DM', 'CKD', 'Sleep_Apnea',"antidepressants", 
+                                     "hormonal_therapy", "statins", "PPI", "SBP", "DBP", 'BMI', 'total_cholesterol', 'creatinine', 'hba1c', 'control_6months', 'SBP_diff_6months', 'BMI_negControl')) # remove additional variables
+tab_cat_vars = c('gender',' race', 'ethnicity', 'HF', 'T2DM', 'CKD', 'Sleep_Apnea',"antidepressants", "hormonal_therapy", "statins", "PPI", 'control_6months') # categorical vars
+tab_vars = c('age', 'gender', 'race', 'ethnicity','HF', 'T2DM', 'CKD', 'Sleep_Apnea',"antidepressants", "hormonal_therapy", "statins", "PPI", "SBP", "DBP", 'BMI', 'total_cholesterol', 'creatinine', 'hba1c', 
+             'control_6months', 'SBP_diff_6months', 'BMI_negControl')
+table1 = CreateTableOne(data = final_df, strata = 'htn_med_class', test = F, vars = tab_vars, factorVars = tab_cat_vars, addOverall = T)
 table1 = print(table1, smd = T)
 write.csv(table1, file.path(path, 'results/step0_datasetCreation/table1.csv'), row.names = T)
+
+# output negative control boxplot
+png(file.path(path, 'results/step0_datasetCreation/bmi_neg_boxplot.png'), width = 800, height = 600)
+ggplot(final_df, aes(x = htn_med_class, y = BMI_negControl, color = htn_med_class)) + geom_boxplot() + theme_bw() + theme(legend.position="none")
+  dev.off()
+
+# output negative control variable 
+bmi_neg = final_df %>% select(person_id, BMI_negControl)
+final_df = final_df %>% select(-BMI_negControl)
+
+
