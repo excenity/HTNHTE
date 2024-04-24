@@ -27,7 +27,7 @@ library(tidyverse)
 # get working directory or set your own
 path = getwd()
 
-# medication list
+# medication type list
 htn_med_list = c('acei', 'arb', 'ccb', 'diuretics', 'acei_arb_diuretic')
 ```
 
@@ -39,7 +39,7 @@ INSTRUCTIONS:
 2. Edit SQL log-on info
 ```{r}
 ## Select SQL type
-sql_flavor = 'sqlite' # change here ('sqlite', 'ms-sql', 'postgres')
+sql_flavor = 'sqlite' #'sqlite' # change here ('sqlite', 'ms-sql', 'postgres')
 
 
 if (sql_flavor == 'ms-sql')
@@ -49,6 +49,19 @@ if (sql_flavor == 'ms-sql')
   
   connectionDetails = createConnectionDetails(
     dbms = "sql server",
+    server = Sys.getenv("HTE_HTN_DB_SERVER"),
+    user = Sys.getenv("HTE_HTN_DB_USER"),
+    password = Sys.getenv("HTE_HTN_DB_PASSWORD"),
+    pathToDriver="C:/Development"
+  )
+  conn = connect(connectionDetails)
+} else if (sql_flavor == 'postgres')
+{
+  Sys.setenv("DATABASECONNECTOR_JAR_FOLDER" = "c:/Development")
+  downloadJdbcDrivers("postgresql")
+  
+  connectionDetails = createConnectionDetails(
+    dbms = "postgresql",
     server = Sys.getenv("HTE_HTN_DB_SERVER"),
     user = Sys.getenv("HTE_HTN_DB_USER"),
     password = Sys.getenv("HTE_HTN_DB_PASSWORD"),
@@ -90,19 +103,22 @@ if (sql_flavor == 'ms-sql')
 } else if (sql_flavor == 'sqlite')
 {
   source(file.path(path, 'STEP0A_DatasetCreation_SQlite.R'))
+} else if (sql_flavor == 'postgres')
+{
+  source(file.path(path, 'STEP0A_DatasetCreation_Postgres.R'))
 }
 ```
 
 # STEP 0B: Analytic Dataset Creation
 
 ## Run Data Wrangling Code
-```{r message=FALSE}
+```{r}
 source('STEP0B_dataset_creation_script.R')
 
 if (output_analytical_dataset == T)
 {
   write.csv(final_df, 'final_df.csv', row.names = F)
-  write.csv(bmi_neg, 'bmi_neg.csv', row.names = F)
+  remove(final_df)
 }
 ```
 

@@ -49,7 +49,7 @@ CF_analysis = function(outcome, htn_med_class_i)
   ite$ethnicity = as.numeric(factor(ite$ethnicity))
   ite$htn_med_class = as.numeric(factor(ite$htn_med_class))
   
-  X = ite %>% select(-c(control_6months, control_12months, SBP_diff_12months, SBP_diff_6months, person_id, ite, htn_med_class))
+  X = ite %>% select(-c(control_6months, SBP_diff_6months, person_id, ite, htn_med_class))
   X_headers = as.data.frame(names(X))
   X = as.matrix(X)
   Y = ite$ite

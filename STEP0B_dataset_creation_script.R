@@ -224,7 +224,7 @@ bp_12months = rename(bp_12months, DBP_12months = DBP, SBP_12months = SBP)
 bmi_codes = OMOP_codes %>% filter(subtype == 'BMI')
 bmi_neg = labs %>% filter(measurement_concept_id %in% bmi_codes$concept_id)
 
-bmi_neg = bmi_neg %>% filter(measurement_date > cohort_start_date %m+% months(1) & measurement_date <= cohort_start_date %m+% months(3))
+bmi_neg = bmi_neg %>% filter(measurement_date > cohort_start_date %m+% months(1) & measurement_date <= cohort_start_date %m+% months(6))
 bmi_neg = bmi_neg %>% group_by(person_id) %>% summarise_at(vars(value_as_number), mean, na.rm = T)
 names(bmi_neg)[2] = 'BMI_negControl'
 

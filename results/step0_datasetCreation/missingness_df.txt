@@ -1,6 +1,0 @@
-               person_id                      age                   gender                     race                ethnicity drug_exposure_start_date        cohort_start_date            htn_med_class                     T2DM 
-                       0                        0                        0                        0                        0                        0                        0                        0                        0 
-                     CKD              Sleep_Apnea                       HF          antidepressants         hormonal_therapy                  statins                      PPI               creatinine                    hba1c 
-                       0                        0                        0                        0                        0                        0                        0                    14529                    23434 
-       total_cholesterol                      BMI                      DBP                      SBP              DBP_6months              SBP_6months             DBP_12months             SBP_12months           BMI_negControl 
-                   19839                     2785                        0                        0                        0                        0                        0                        0                    13355 

@@ -62,7 +62,7 @@ xgboost.learners = create.Learner("SL.xgboost", tune = xg.tune, detailed_names =
 
 
 ## SuperLearner Modeling Function
-step1_ite_SL = function(med_class_i, df, outcome, months = 6)
+step1_ite_SL = function(med_class_i, df, outcome)
 {
   # create med class comparisons 
   df_comp = df 
@@ -70,38 +70,38 @@ step1_ite_SL = function(med_class_i, df, outcome, months = 6)
   df_comp$htn_med_class = factor(df_comp$htn_med_class, levels = c('other', htn_med_list[med_class_i]))
   person_id_df = df_comp$person_id
   
-  # finalize analytical dataset (X, y)
-  if (months == 12)
-  {
+  # # finalize analytical dataset (X, y)
+  # if (months == 12)
+  # {
+  #   if (outcome == 'at_control')
+  #   {
+  #     X = df_comp %>% select(-c(control_6months, SBP_diff_6months)) 
+  #     y = as.numeric(df_comp$control_12months) - 1
+  #     SL.family = 'binomial'
+  #     SL.method = 'method.AUC'
+  #   } else 
+  #   {
+  #     X = df_comp %>% select(-c(control_6months, SBP_diff_6months)) 
+  #     y = df_comp$SBP_diff_12months 
+  #     SL.family = 'gaussian'
+  #     SL.method = 'method.NNLS'
+  #   }
+  # } else if (months == 6)
+  # {
     if (outcome == 'at_control')
     {
-      X = df_comp %>% select(-c(SBP_diff_12months, control_12months, control_6months, SBP_diff_6months)) 
-      y = as.numeric(df_comp$control_12months) - 1
+      X = df_comp %>% select(-c(control_6months, SBP_diff_6months, person_id)) 
+      y = df_comp$control_6months
       SL.family = 'binomial'
       SL.method = 'method.AUC'
     } else 
     {
-      X = df_comp %>% select(-c(SBP_diff_12months, control_12months, control_6months, SBP_diff_6months)) 
-      y = df_comp$SBP_diff_12months 
-      SL.family = 'gaussian'
-      SL.method = 'method.NNLS'
-    }
-  } else if (months == 6)
-  {
-    if (outcome == 'at_control')
-    {
-      X = df_comp %>% select(-c(SBP_diff_12months, control_12months, control_6months, SBP_diff_6months)) 
-      y = as.numeric(df_comp$control_6months) - 1 
-      SL.family = 'binomial'
-      SL.method = 'method.AUC'
-    } else 
-    {
-      X = df_comp %>% select(-c(SBP_diff_12months, control_12months, control_6months, SBP_diff_6months)) 
+      X = df_comp %>% select(-c(control_6months, SBP_diff_6months, person_id)) 
       y = df_comp$SBP_diff_6months
       SL.family = 'gaussian'
       SL.method = 'method.NNLS'
     }
-  }
+  #}
   
   # Choose Candidate Learners and CV Params
   set.seed(618)

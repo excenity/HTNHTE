@@ -44,15 +44,15 @@ rm(list = c('create_med_temp_table', 'fill_med_temp_table'))
 
 create_med_temp_table = 
   "
-  DROP TABLE IF EXISTS #con_meds_codes_list;
-  CREATE TABLE #con_meds_codes_list
+  DROP TABLE IF EXISTS #concurrent_meds_codes_list;
+  CREATE TABLE #concurrent_meds_codes_list
   (
     concept_id INT
   )
 "
 
 fill_med_temp_table = lapply(concurrent_meds_codes_list, function(val) {
-  return(paste0("INSERT INTO #con_meds_codes_list (concept_id) VALUES (", val, ");"))
+  return(paste0("INSERT INTO #concurrent_meds_codes_list (concept_id) VALUES (", val, ");"))
 })
 fill_med_temp_table = paste(fill_med_temp_table, collapse='\n', sep='\n')
 
@@ -282,7 +282,7 @@ names(cohort) = str_to_lower(names(cohort))
 sql_query = "SELECT person_id,
   drug_concept_id,
   drug_exposure_start_date
-  FROM #con_meds_cohort;"
+  FROM #concurrent_meds_cohort;"
 concurrent_meds = renderTranslateQuerySql(conn, sql_query)
 names(concurrent_meds)[3] = 'drug_exposure_start_date'
 names(concurrent_meds) = str_to_lower(names(concurrent_meds))
@@ -324,15 +324,15 @@ consort_df = function(df, name)
   return(df)
 }
 
-first_htn_count = renderTranslateQuerySql(conn, "SELECT COUNT(DISTINCT subject_id) FROM first_htn;")
+first_htn_count = renderTranslateQuerySql(conn, "SELECT COUNT(DISTINCT subject_id) FROM #first_htn;")
 first_htn_count = consort_df(first_htn_count, 'first_htn')
-early_rx_count = renderTranslateQuerySql(conn, "SELECT COUNT(DISTINCT subject_id) FROM early_rx")
+early_rx_count = renderTranslateQuerySql(conn, "SELECT COUNT(DISTINCT subject_id) FROM #early_rx")
 early_rx_count = consort_df(early_rx_count, 'early_rx')
-pregnant_pt_count = renderTranslateQuerySql(conn, "SELECT COUNT(DISTINCT subject_id) FROM pregnant_pt WHERE subject_id IN (SELECT subject_id FROM early_rx);")
+pregnant_pt_count = renderTranslateQuerySql(conn, "SELECT COUNT(DISTINCT subject_id) FROM #pregnant_pt WHERE subject_id IN (SELECT subject_id FROM #early_rx);")
 pregnant_pt_count = consort_df(pregnant_pt_count, 'pregnant_pt')
-htn_med_presc_early_count = renderTranslateQuerySql(conn, "SELECT COUNT(DISTINCT person_id) FROM htn_med_prescribed_earliest;")
+htn_med_presc_early_count = renderTranslateQuerySql(conn, "SELECT COUNT(DISTINCT person_id) FROM #htn_med_prescribed_earliest;")
 htn_med_presc_early_count = consort_df(htn_med_presc_early_count, 'htn_med_presc_early')
-prior_visit_count = renderTranslateQuerySql(conn, "SELECT COUNT(DISTINCT person_id) FROM prior_visit WHERE person_id IN (SELECT person_id FROM htn_med_prescribed_earliest);")
+prior_visit_count = renderTranslateQuerySql(conn, "SELECT COUNT(DISTINCT person_id) FROM #prior_visit WHERE person_id IN (SELECT person_id FROM #htn_med_prescribed_earliest);")
 prior_visit_count = consort_df(prior_visit_count, 'prior_visit')
 
 consort = rbind(first_htn_count, early_rx_count, pregnant_pt_count, htn_med_presc_early_count, prior_visit_count)
