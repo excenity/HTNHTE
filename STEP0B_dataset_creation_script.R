@@ -280,7 +280,7 @@ norm_df = predict(norm_process, final_df %>% select(norm_vars))
 final_df[, norm_vars] = norm_df
 
 # multiple imputation
-mice_df = mice(final_df %>% select(-c(person_id, drug_exposure_start_date, cohort_start_date)), m = 1, maxit = 50, method = 'pmm', seed = 618, verbose = F)
+mice_df = mice(final_df %>% select(-c(person_id, drug_exposure_start_date, cohort_start_date)), m = 1, maxit = 1000, method = 'pmm', seed = 618, verbose = F)
 png(file.path(path, 'results/step0_datasetCreation/imputation.png'), width = 800, height = 600)
 densityplot(mice_df)
 dev.off()
