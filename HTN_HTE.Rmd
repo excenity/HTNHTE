@@ -113,6 +113,9 @@ if (sql_flavor == 'ms-sql')
 
 ## Run Data Wrangling Code
 ```{r}
+# combine acei, arb diuretic combos
+OMOP_codes$subtype[OMOP_codes$subtype %in% c('acei_diuretic', 'arb_diuretic')] = 'acei_arb_diuretic'
+
 source('STEP0B_dataset_creation_script.R')
 
 if (output_analytical_dataset == T)

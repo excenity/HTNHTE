@@ -95,7 +95,7 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
 
 ## ---- TMLE Analysis Iterative over Patient Profiles
 
-TMLE_analysis = function(outcome_i)
+TMLE_analysis = function(outcome)
 {
   for (med_class_i in 1:length(htn_med_list))
   {
@@ -114,7 +114,7 @@ TMLE_analysis = function(outcome_i)
       intervention = htn_med_list[med_class_i]
       intervention = as.numeric(as.factor(df_pp$htn_med_class), levels = c('others', intervention))-1
       print(table(intervention))
-      tmle_fit = TMLE_patientProfile(df = df_pp, outcome = outcome_i, intervention_levels = intervention)
+      tmle_fit = TMLE_patientProfile(df = df_pp, outcome = outcome, intervention_levels = intervention)
       
       # calculate Efficient Influence Function and Variance
       q_init = tmle_fit$Qinit$Q[,2]
@@ -167,7 +167,7 @@ TMLE_analysis = function(outcome_i)
     {tmle_results_df = rbind(tmle_results_df, tmle_results_chunk)}
   }  
   
-  write.csv(tmle_results_df, file.path(path, paste0('results/step3_TMLE_analysis/tmle_results_df_', outcome_i, '.csv')), row.names = F)
+  write.csv(tmle_results_df, file.path(path, paste0('results/step3_TMLE_analysis/tmle_results_df_', outcome, '.csv')), row.names = F)
   
   
   ## ---- Visualize TMLE Results
@@ -179,7 +179,7 @@ TMLE_analysis = function(outcome_i)
   # Overview
   TMLE_plot = ggplot(tmle_results_df, aes(x = htn_med_class, y = Q1_star_avg, color = htn_med_class)) + geom_point() + geom_linerange(aes(ymin=Q1_star_lb, ymax=Q1_star_ub)) + 
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + facet_wrap('patient_profiles') + theme_bw() + xlab('Hypertension Medication Class') + ylab('Predicted Treatment Effect')
-  ggsave(file.path(path, paste0('results/step3_TMLE_analysis/TMLE_plot_', outcome_i, '.png')), TMLE_plot, height = 16, width = 30)
+  ggsave(file.path(path, paste0('results/step3_TMLE_analysis/TMLE_plot_', outcome, '.png')), TMLE_plot, height = 16, width = 30)
 }
 
 # run TMLE analysis across all outcomes (at 6 months)
