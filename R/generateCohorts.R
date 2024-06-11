@@ -174,7 +174,7 @@ getData <- function(
     conceptSet = c(3004249,3012888),
     startDay = -30*6, endDay=0,
     aggregateMethod = 'recent',
-    covariateId = 1466,
+    covariateId = 8466,
     analysisId = 466
   )
 
@@ -183,7 +183,7 @@ getData <- function(
     conceptSet = c(3004249,3012888),
     startDay = 30*1+1, endDay=30*6,
     aggregateMethod = 'latest',
-    covariateId = 1466,
+    covariateId = 9466,
     analysisId = 466
   )
 
