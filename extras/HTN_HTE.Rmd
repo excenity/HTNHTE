@@ -1,0 +1,161 @@
+---
+title: "HTN HTE Analysis"
+author: "Jingzhi Kevin Yu"
+date: "4/15/24"
+output: html_document
+---
+
+# STEP 0A: Extract Data from Database
+
+## Setup 
+1. Load relevant database connection tools 
+2. Get working directory which will be used to create folders to save results
+```{r, setup}
+if (!require(DatabaseConnector))
+{
+  install.packages("DatabaseConnector")
+}
+if (!require(SqlRender))
+{
+  install.packages("SqlRender")
+}
+
+library(DatabaseConnector)
+library(SqlRender)
+library(tidyverse)
+
+# get working directory or set your own
+path = getwd()
+
+# medication type list
+htn_med_list = c('acei', 'arb', 'ccb', 'diuretics', 'acei_arb_diuretic')
+```
+
+#### INPUT CHUNK ####
+
+## SQL CONNECTION
+INSTRUCTIONS:
+1. Select SQL type 
+2. Edit SQL log-on info
+```{r}
+## Select SQL type
+sql_flavor = 'sqlite' #'sqlite' # change here ('sqlite', 'ms-sql', 'postgres')
+
+
+if (sql_flavor == 'ms-sql')
+{
+  Sys.setenv("DATABASECONNECTOR_JAR_FOLDER" = "c:/Development")
+  downloadJdbcDrivers("sql server")
+  
+  connectionDetails = createConnectionDetails(
+    dbms = "sql server",
+    server = Sys.getenv("HTE_HTN_DB_SERVER"),
+    user = Sys.getenv("HTE_HTN_DB_USER"),
+    password = Sys.getenv("HTE_HTN_DB_PASSWORD"),
+    pathToDriver="C:/Development"
+  )
+  conn = connect(connectionDetails)
+} else if (sql_flavor == 'postgres')
+{
+  Sys.setenv("DATABASECONNECTOR_JAR_FOLDER" = "c:/Development")
+  downloadJdbcDrivers("postgresql")
+  
+  connectionDetails = createConnectionDetails(
+    dbms = "postgresql",
+    server = Sys.getenv("HTE_HTN_DB_SERVER"),
+    user = Sys.getenv("HTE_HTN_DB_USER"),
+    password = Sys.getenv("HTE_HTN_DB_PASSWORD"),
+    pathToDriver="C:/Development"
+  )
+  conn = connect(connectionDetails)
+} else if (sql_flavor == 'sqlite')
+{ 
+    if (!require(RSQLite))
+  {
+    install.packages("RSQLite")
+  }
+    library(RSQLite)
+    conn = connect(dbms = "sqlite", server = '/Users/excenity/Documents/HSIP/Research/Dissertation Project/Data/EDW OMOP.db')
+    cdmDbSchema = 'main'
+}
+```
+
+## INTERMEDIATE FILES
+--> Determine whether analytic dataset will be saved for future analysis. 
+--> If not saved, analytic dataset (`final_df.csv`) must be generated via the `Data Querying` codes prior to running the analysis scripts 
+  (Steps 1, 2, 3) 
+--> If saved, once the analytic dataset (`final_df.csv`) has been produced, analysis can be run directly from Step 1.
+```{r}
+# Export analytic dataset for future analysis?
+output_analytical_dataset = F
+```
+
+
+#### SCRIPTS ####
+
+--- Data Querying ---
+
+## Query Code
+```{r}
+if (sql_flavor == 'ms-sql')
+{
+  source(file.path(path, 'STEP0A_DatasetCreation_MSSQL.R'))
+} else if (sql_flavor == 'sqlite')
+{
+  source(file.path(path, 'STEP0A_DatasetCreation_SQlite.R'))
+} else if (sql_flavor == 'postgres')
+{
+  source(file.path(path, 'STEP0A_DatasetCreation_Postgres.R'))
+}
+```
+
+# STEP 0B: Analytic Dataset Creation
+
+## Run Data Wrangling Code
+```{r}
+# combine acei, arb diuretic combos
+OMOP_codes$subtype[OMOP_codes$subtype %in% c('acei_diuretic', 'arb_diuretic')] = 'acei_arb_diuretic'
+
+source('STEP0B_dataset_creation_script.R')
+
+if (output_analytical_dataset == T)
+{
+  write.csv(final_df, 'final_df.csv', row.names = F)
+  remove(final_df)
+}
+```
+
+--- Statistical Analysis ---
+
+## PART 1: Explore patient characteristics that contribute to HTE
+
+# STEP 1: Individual Treatment Effects (ITE) Estimation via G-estimation
+```{r}
+source('STEP1_ITE_estimation.R')
+```
+
+# STEP 2: Causal Forest to Identify Factors Contributing Most to Heterogeneity
+```{r}
+source('STEP2_CF_HTE.R')
+```
+
+## -- STOP HERE AND REVIEW RESULTS OF STEP 2 -- ## 
+
+
+## PART 2: Use targeted estimation to determine treatment effects of BP medications
+
+# STEP 3: Targeted Maximum Likelihood Estimation (TMLE) of Medication Treatment Effects within Different Patient Populations
+```{r}
+# input variables of importance used for creating patient profiles
+cont_var = c('age', 'SBP', 'DBP', 'BMI', 'total_cholesterol', 'creatinine')
+
+# input cutoffs of variables used for creating patient profiles 
+cutpoints = list(c(0, 65, 150), 
+                 c(0 ,150, 300), 
+                 c(0, 90, 200), 
+                 c(0, 30, 100), 
+                 c(0, 200, 300), 
+                 c(0, 0.95, 5))
+
+source('STEP3_TMLE_HTE.R')
+```
