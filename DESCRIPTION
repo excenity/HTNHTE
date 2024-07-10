@@ -1,0 +1,36 @@
+Package: HTNHTE
+Type: Package
+Title: Persalized Causal Inference Study
+Version: 0.0.1
+Date: 2024-05-30
+Authors@R: c(
+	person("add", "name", , "addemail@here.com", role = c("aut", "cre"))
+	)
+Maintainer: add name <addemail@here.com>
+Description: A study to investigate personalised causal inference
+License: Apache License 2.0
+Depends:
+	R (>= 4.0.0)
+Imports:
+  Andromeda,
+	DatabaseConnector (>= 6.3.1),
+	PatientLevelPrediction,
+	CohortGenerator,
+	ROhdsiWebApi,
+	FeatureExtraction  (>= 3.5.0),
+	SqlRender (>= 1.9.0),
+	ParallelLogger (>= 3.0.0),
+	dplyr,
+	rlang
+Suggests:
+  devtools,
+	testthat,
+	knitr
+Remotes:
+	ohdsi/PatientLevelPrediction,
+	ohdsi/ROhdsiWebApi,
+	ohdsi/CohortGenerator
+NeedsCompilation: no
+RoxygenNote: 7.3.1
+Encoding: UTF-8
+VignetteBuilder: knitr
