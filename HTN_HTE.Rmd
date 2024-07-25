@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r, setup}
-if (!require(SqlRender))
+if (!require(SuperLearner))
 {
   install.packages("SuperLearner")
 }
