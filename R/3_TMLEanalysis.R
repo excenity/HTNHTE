@@ -34,20 +34,6 @@ createPatientProfiles = function(cont_var, cutpoints, df)
   return(df)
 }
 
-# random forest
-RF.learners = SuperLearner::create.Learner("SL.ranger", tune = list(mtry = 3, num.trees = 500))
-
-# xgboost
-tune = list(ntrees = c(5, 10, 15),
-            max_depth = 2:5,
-            eta = c(0.1, 0.05, 0.01))
-xgboost.learners = SuperLearner::create.Learner("SL.xgboost", tune = tune, detailed_names = TRUE, name_prefix = "xgb")
-
-# elastic net
-enet = SuperLearner::create.Learner("SL.glmnet", detailed_names = T, tune = list(alpha = seq(0, 1, length.out = 5)))
-
-# list libraries
-SL.library.chosen = c("SL.mean", "SL.glm", "SL.glm.interaction", enet$names, xgboost.learners$names, RF.learners$names)
 
 ### TMLE helper function
 TMLE_patientProfile = function(df, outcome, intervention_levels)
@@ -66,7 +52,7 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
   {
     tmle_Y = df$bp_13080
     tmle_family = 'binomial'
-  } else if (outcome == 'SBP_change')
+  } else if (outcome == 'sbp_change')
   {
     tmle_Y = df$sbp_change
     tmle_family = 'gaussian'
@@ -140,7 +126,7 @@ TMLE_analysis = function(outcome, patient_profile_list)
       } else if (outcome == 'at_control_13080')
       {
         tmle_Y = df_pp$bp_13080
-      } else if (outcome == 'SBP_change')
+      } else if (outcome == 'sbp_change')
       {
         tmle_Y = df_pp$sbp_change
       }
