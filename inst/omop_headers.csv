@@ -1,0 +1,47 @@
+﻿covariateName,header
+age in years,age
+Measurement during day -180 through 0 days relative to index: SBP baseline,sbp
+Measurement during day -180 through 0 days relative to index: DBP baseline,dbp
+Measurement during day -180 through 0 days relative to index: total_cholesterol baseline,chol
+Measurement during day -180 through 0 days relative to index: LDL baseline,ldl
+Measurement during day -180 through 0 days relative to index: creatinine baseline,creatinine
+Measurement during day 31 through 180 days relative to index: BMI negControl,bmi_neg
+Measurement during day -180 through 0 days relative to index: hba1c baseline,hba1c
+Measurement during day 31 through 180 days relative to index: SBP 6 Months,sbp_6m
+Measurement during day 31 through 180 days relative to index: DBP 6 months,dbp_6m
+Measurement during day -180 through 0 days relative to index: BMI baseline,bmi
+gender = MALE,male
+race = Asian,asian
+race = Black or African American,black
+race = White,white
+gender = FEMALE,female
+gender = UNKNOWN,gender_unknown
+race = Unknown,race_unknown
+race = Native Hawaiian or Other Pacific Islander,pacific_islander
+race = American Indian or Alaska Native,american_indian
+cohort during day -365 through 0 days relative to index: acei,acei
+cohort during day -365 through 0 days relative to index: antidepressants,antidepressants
+cohort during day -365 through 0 days relative to index: arb,arb
+cohort during day -365 through 0 days relative to index: acei_ccb,acei_ccb
+cohort during day -365 through 0 days relative to index: arb_ccb,arb_ccb
+cohort during day -365 through 0 days relative to index: acei_diuretic,acei_diuretic
+cohort during day -365 through 0 days relative to index: arb_diuretic,arb_diuretic
+cohort during day -365 through 0 days relative to index: T2DM,dm
+cohort during day -365 through 0 days relative to index: CKD,ckd
+cohort during day -365 through 0 days relative to index: Sleep_Apnea,sleep_apnea
+cohort during day -365 through 0 days relative to index: HF,hf
+cohort during day -365 through 0 days relative to index: hormonal_therapy,hormonal_therapy
+cohort during day -365 through 0 days relative to index: statins,statins
+cohort during day -365 through 0 days relative to index: PPI,ppi
+cohort during day -365 through 0 days relative to index: beta_blockers,bb
+cohort during day -365 through 0 days relative to index: ccb,ccb
+cohort during day -365 through 0 days relative to index: diuretics,diuretic
+ethnicity = Hispanic or Latino,hispanic
+ethnicity = Not Hispanic or Latino,non-hispanic
+race = Asian Indian,asian_indian
+race = Chinese,chinese
+race = Filipino,filipino
+race = Japanese,japanese
+race = Korean,korean
+race = Vietnamese,vietnamese
+race = Other Pacific Islander,other_pacific

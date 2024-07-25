@@ -16,6 +16,7 @@
 #' The cohorts are generated into the specified cohort schema and table
 #'
 #' @export
+#'
 generateCohorts <- function(
     connectionDetails,
     cdmDatabaseSchema,
@@ -95,14 +96,13 @@ getData <- function(
       1789836, 1789837, 1789838, 1789839,
       1789832, 1789840, 1789841, 1789842,
       1789829, 1789830, 1789833, 1789834,
-      1789835, 1789847, 1789848, 1789849,
-      1789850, 1789851, 1789852
+      1789848, 1789849, 1789850, 1789851, 1789852
       ),
   cohortName = c(
     'T2DM', 'CKD', 'Sleep_Apnea', 'HF',
     'antidepressants', 'hormonal_therapy', 'statins', 'PPI',
-    'acei', 'acei_diuretic', 'arb',  'arb_diuretic', 'bb_arb',
-    'bb_diuretics', 'beta_blockers', 'ccb', 'ccb_acei',
+    'acei', 'acei_diuretic', 'arb',  'arb_diuretic',
+    'beta_blockers', 'ccb', 'ccb_acei',
     'ccb_arb', 'diuretics'
   )
   ),
@@ -169,20 +169,29 @@ getData <- function(
   )
 
   measurementFeature8 <- createMeasurementCovariateSettings(
-    covariateName = 'BP baseline',
-    conceptSet = c(3004249, 3012888),
-    startDay = -30*6, endDay=0,
+    covariateName = 'SBP 6 Months',
+    conceptSet = c(3004249),
+    startDay = 30*1+1, endDay=30*6,
     aggregateMethod = 'recent',
     covariateId = 8466,
     analysisId = 466
   )
 
   measurementFeature9 <- createMeasurementCovariateSettings(
-    covariateName = 'BP 6 month',
-    conceptSet = c(3004249,3012888),
+    covariateName = 'DBP 6 months',
+    conceptSet = c(3012888),
     startDay = 30*1+1, endDay=30*6,
     aggregateMethod = 'latest',
     covariateId = 9466,
+    analysisId = 466
+  )
+
+  measurementFeature10 <- createMeasurementCovariateSettings(
+    covariateName = 'BMI baseline',
+    conceptSet = c(3038553),
+    startDay = -30*6, endDay=0,
+    aggregateMethod = 'recent',
+    covariateId = 10466,
     analysisId = 466
   )
 
@@ -195,7 +204,7 @@ getData <- function(
       outcomeDatabaseSchema = cohortDatabaseSchema,
       cohortTable = cohortTable,
       outcomeTable = cohortTable,
-      targetId = 1789828,
+      targetId = 1790266,
       outcomeIds = -999
       ),
     covariateSettings = list(
@@ -203,7 +212,7 @@ getData <- function(
       cohortFeatures,
       measurementFeature1,measurementFeature2,measurementFeature3,
       measurementFeature4,measurementFeature5,measurementFeature6,
-      measurementFeature7, measurementFeature8, measurementFeature9
+      measurementFeature7, measurementFeature8, measurementFeature9, measurementFeature10
     ), restrictPlpDataSettings = PatientLevelPrediction::createRestrictPlpDataSettings(
 
     )

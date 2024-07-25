@@ -1,0 +1,127 @@
+---
+title: "HTN HTE Analysis"
+author: "Jingzhi Kevin Yu"
+date: "4/15/24"
+output: html_document
+---
+
+```{r, setup}
+if (!require(SqlRender))
+{
+  install.packages("SuperLearner")
+}
+
+library(HTNHTE)
+library(DatabaseConnector)
+library(SqlRender)
+library(SuperLearner)
+library(tidyverse)
+
+# get working directory or set your own
+path = getwd()
+
+# medication type list
+htn_med_list = c('acei', 'arb', 'ccb', 'diuretic', 'ccb_combo', 'diuretic_combo')
+```
+
+#### COHORT EXTRACTION ####
+
+INSTRUCTIONS: Edit connection details
+```{r}
+# extract cohort definitions
+extractCohortDefinitionSet('inst')
+
+# Connection Details
+##### PLEASE EDIT ##### 
+connectionDetails = createConnectionDetails(
+  dbms = "postgresql",
+  server = 'localhost/HTN_OMOP',
+  user = 'postgres',
+  password = '741China@',
+  pathToDriver = '/Users/excenity/Library/R/jdbcDrivers'
+)
+
+# create cohorts from defintiions (via generating SQL queries)
+generateCohorts(
+    connectionDetails = connectionDetails,
+    cdmDatabaseSchema = 'htnhte',
+    cohortDatabaseSchema = 'htnhte',
+    cohortTable = 'htn_hte',
+)
+```
+
+#### ANALYTIC DATASET GENERATION ####
+
+```{r}
+# getting the covariates data from cohorts as well as generating analytic dataset
+omop_df = getData(
+    cdmDatabaseSchema = 'htnhte',
+    connectionDetails = connectionDetails,
+    cohortDatabaseSchema = 'htnhte',
+    cohortTable = 'htn_hte'
+)
+
+df = generateAnalyticDataset(omop_df)
+```
+
+
+#### STATISTICAL ANALYSIS ####
+
+## PART 1: Explore patient characteristics that contribute to HTE
+
+# STEP 1: Individual Treatment Effects (ITE) Estimation via G-estimation
+```{r}
+for (i in 1:length(htn_med_list))
+{
+  print(htn_med_list[i])
+  ite = step1_ite_SL(i, df, 'at_control_14090')
+  write.csv(ite, file.path(path, paste0('results/step1_ITE_estimation/ITE_at_control_14090_', htn_med_list[i], '.csv')), row.names = F)
+  ite = step1_ite_SL(i, df, 'at_control_13080')
+  write.csv(ite, file.path(path, paste0('results/step1_ITE_estimation/ITE_at_control_13080_', htn_med_list[i], '.csv')), row.names = F)
+  ite = step1_ite_SL(i, df, 'sbp_change')
+  write.csv(ite, file.path(path, paste0('results/step1_ITE_estimation/ITE_sbp_change_', htn_med_list[i], '.csv')), row.names = F)
+}
+
+```
+
+# STEP 2: Causal Forest to Identify Factors Contributing Most to Heterogeneity
+```{r}
+for (i in 1:length(htn_med_list))
+{
+  htn_med_class_i = htn_med_list[i]
+  print(htn_med_class_i)
+  # CF analysis for at control
+  CF_analysis(htn_med_class_i, df, 'at_control_14090')
+  # CF analysis for at control
+  CF_analysis(htn_med_class_i, df, 'at_control_13080')
+  # CF analysis for change in SBP
+  CF_analysis(htn_med_class_i, df, 'sbp_change')
+}
+```
+
+## -- STOP HERE AND REVIEW RESULTS OF STEP 2 -- ## 
+
+## PART 2: Use targeted estimation to determine treatment effects of BP medications
+
+# STEP 3: Targeted Maximum Likelihood Estimation (TMLE) of Medication Treatment Effects within Different Patient Populations
+```{r}
+cont_var = c('sbp', 'ldl', 'age', 'bmi')
+
+cutpoints = list(c(0, 150, 300),
+                 c(0 ,100, 300),
+                 c(0, 65, 150),
+                 c(0, 30, 100))
+
+
+# create patient profiles
+df = createPatientProfiles(cont_var, cutpoints, df)
+patient_profile_list = df %>% distinct(patient_profiles)
+
+# TMLE Analysis for Main Outcomes
+TMLE_analysis(outcome = 'at_control_14090', patient_profile_list)
+TMLE_analysis(outcome = 'at_control_13080', patient_profile_list)
+TMLE_analysis(outcome = 'sbp_change', patient_profile_list)
+
+# TMLE Analysis for Negative Control Outcome
+TMLE_analysis_neg()
+```

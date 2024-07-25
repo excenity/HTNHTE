@@ -4,7 +4,7 @@
 \name{HTNHTE-package}
 \alias{HTNHTE}
 \alias{HTNHTE-package}
-\title{HTNHTE: Persalized Causal Inference Study}
+\title{HTNHTE: Personalized Causal Inference Study}
 \description{
 A study to investigate personalised causal inference
 }
