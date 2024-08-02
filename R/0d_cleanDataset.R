@@ -84,8 +84,8 @@ generateAnalyticDataset = function(data)
   df$ccb_combo = ifelse(df$acei_ccb == 1 | df$arb_ccb == 1, 1, 0)
 
   # remove those with more than 3 classes
-  df = df %>% filter(diuretic_combo + ccb < 2 | diuretic_combo + bb < 2)
-  df = df %>% filter(ccb_combo + diuretic < 2 | ccb_combo + bb < 2)
+  df = df %>% filter(diuretic_combo + ccb + bb < 2)
+  df = df %>% filter(ccb_combo + diuretic + bb < 2)
 
   # reset single medication classes for dual therapies
   df$acei[df$diuretic_combo == 1 | df$ccb_combo == 1] = 0
@@ -95,8 +95,11 @@ generateAnalyticDataset = function(data)
 
   ## combine variables
   med_class_df = df %>% select(pid, acei, arb, bb, ccb, diuretic, ccb_combo, diuretic_combo) %>% pivot_longer(cols = acei:diuretic_combo, names_to = 'htn_med_class', values_to = 'value') %>% filter(value == 1)
-  med_class_list = med_class_df %>% group_by(pid) %>% count() %>% filter(n==1) %>% select(pid)
-  med_class_df = med_class_df %>% filter(pid %in% med_class_list$pid)
+  med_class_list = med_class_df %>% group_by(pid) %>% count()
+  med_class_list = med_class_list %>% filter(n < 3)
+  med_class_list_otherCombo = med_class_list %>% filter(n == 2) %>% distinct(pid)
+  med_class_df$htn_med_class[med_class_df$pid %in% med_class_list_otherCombo$pid] = 'other_combo'
+  med_class_df = med_class_df %>% filter(pid %in% med_class_list$pid) %>% distinct()
   df = inner_join(df, med_class_df %>% select(-value))
   df = df %>% select(-c(acei, acei_diuretic, acei_ccb, arb, arb_diuretic, arb_ccb, bb, ccb, diuretic, acei_diuretic, acei_ccb, arb_ccb, diuretic_combo, ccb_combo))
   df$htn_med_class[is.na(df$htn_med_class)] = 'other'

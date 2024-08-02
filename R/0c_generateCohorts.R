@@ -115,7 +115,7 @@ getData <- function(
     covariateName = 'SBP baseline',
     conceptSet = c(3004249),
     startDay = -30*6, endDay=0,
-    aggregateMethod = 'recent',
+    aggregateMethod = 'latest',
     covariateId = 1466,
     analysisId = 466
   )
@@ -123,7 +123,7 @@ getData <- function(
     covariateName = 'DBP baseline',
     conceptSet = c(3012888),
     startDay = -30*6, endDay=0,
-    aggregateMethod = 'recent',
+    aggregateMethod = 'latest',
     covariateId = 2466,
     analysisId = 466
   )
@@ -131,7 +131,7 @@ getData <- function(
     covariateName = 'total_cholesterol baseline',
     conceptSet = c(3019900, 3027114),
     startDay = -30*6, endDay=0,
-    aggregateMethod = 'recent',
+    aggregateMethod = 'latest',
     covariateId = 3466,
     analysisId = 466
   )
@@ -139,7 +139,7 @@ getData <- function(
     covariateName = 'LDL baseline',
     conceptSet = c(3001308,3009966,3035899,3035009,36032416,36031267,36031404,927157,42870529,40758569,3039873,3053341,3038988,4041556,4210878,3008631,3028288,3028437),
     startDay = -30*6, endDay=0,
-    aggregateMethod = 'recent',
+    aggregateMethod = 'latest',
     covariateId = 4466,
     analysisId = 466
   )
@@ -147,7 +147,7 @@ getData <- function(
     covariateName = 'creatinine baseline',
     conceptSet = c(3016723,3020564),
     startDay = -30*6, endDay=0,
-    aggregateMethod = 'recent',
+    aggregateMethod = 'latest',
     covariateId = 5466,
     analysisId = 466
   )
@@ -155,7 +155,7 @@ getData <- function(
     covariateName = 'BMI negControl',
     conceptSet = c(3038553),
     startDay = 30*1+1, endDay=30*6,
-    aggregateMethod = 'mean',
+    aggregateMethod = 'latest',
     covariateId = 6466,
     analysisId = 466
   )
@@ -163,7 +163,7 @@ getData <- function(
     covariateName = 'hba1c baseline',
     conceptSet = c(3004410),
     startDay = -30*6, endDay=0,
-    aggregateMethod = 'recent',
+    aggregateMethod = 'latest',
     covariateId = 7466,
     analysisId = 466
   )
@@ -172,7 +172,7 @@ getData <- function(
     covariateName = 'SBP 6 Months',
     conceptSet = c(3004249),
     startDay = 30*1+1, endDay=30*6,
-    aggregateMethod = 'recent',
+    aggregateMethod = 'latest',
     covariateId = 8466,
     analysisId = 466
   )
@@ -190,7 +190,7 @@ getData <- function(
     covariateName = 'BMI baseline',
     conceptSet = c(3038553),
     startDay = -30*6, endDay=0,
-    aggregateMethod = 'recent',
+    aggregateMethod = 'latest',
     covariateId = 10466,
     analysisId = 466
   )
