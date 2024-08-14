@@ -22,11 +22,15 @@ createPatientProfiles = function(cont_var, cutpoints, df)
     names(df)[names(df) == 'new_col'] = cont_var_names[i]
   }
 
-  df = df %>% unite(col = 'patient_profiles', all_of(c(cont_var_names)), remove = F)
+  df = df %>% tidyr::unite(
+    col = 'patient_profiles',
+    tidyr::all_of(c(cont_var_names)),
+    remove = F
+    )
 
   # get list of distinct patient profiles and corresponding variable categories
   patient_profile_list = df[,c('patient_profiles', cont_var_names)]
-  patient_profile_list = patient_profile_list %>% distinct()
+  patient_profile_list = patient_profile_list %>% dplyr::distinct()
 
   return(df)
 }
@@ -39,7 +43,7 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
   set.seed(618)
 
   # prepare dataset
-  X = df %>% select(c("age", "gender", "race", "hispanic", "dm", "ckd", "hf", "sleep_apnea", "antidepressants", "hormonal_therapy", "statins", "ppi", "dbp", "sbp", "chol", "ldl", "creatinine", "hba1c"))
+  X = df %>% dplyr::select(c("age", "gender", "race", "hispanic", "dm", "ckd", "hf", "sleep_apnea", "antidepressants", "hormonal_therapy", "statins", "ppi", "dbp", "sbp", "chol", "ldl", "creatinine", "hba1c"))
 
   if (outcome == 'at_control_14090')
   {
