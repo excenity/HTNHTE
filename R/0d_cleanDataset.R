@@ -109,8 +109,12 @@ generateAnalyticDataset = function(
   df$ccb_combo = ifelse(df$acei_ccb == 1 | df$arb_ccb == 1, 1, 0)
 
   # remove those with more than 3 classes
-  df = df %>% dplyr::filter(diuretic_combo + ccb < 2 | diuretic_combo + bb < 2)
-  df = df %>% dplyr::filter(ccb_combo + diuretic < 2 | ccb_combo + bb < 2)
+
+  #df = df %>% dplyr::filter(diuretic_combo + ccb < 2 | diuretic_combo + bb < 2)
+  #df = df %>% dplyr::filter(ccb_combo + diuretic < 2 | ccb_combo + bb < 2)
+  df = df %>% dplyr::filter(diuretic_combo + ccb + bb < 2)
+  df = df %>% dplyr::filter(ccb_combo + diuretic + bb < 2)
+
 
   # reset single medication classes for dual therapies
   df$acei[df$diuretic_combo == 1 | df$ccb_combo == 1] = 0
@@ -129,12 +133,22 @@ generateAnalyticDataset = function(
   med_class_list = med_class_df %>%
     dplyr::group_by(.data$pid) %>%
     dplyr::count() %>%
-    dplyr::filter(.data$n==1) %>%
-    dplyr::select("pid")
+    #dplyr::filter(.data$n==1) %>%
+    dplyr::filter(.data$n < 3) #%>%
+    #dplyr::select("pid")
+  
+  # new code added that had conflict
+  med_class_list_otherCombo = med_class_list %>% 
+  dplyr::filter(n == 2) %>% 
+  dplyr::distinct("pid")
+  med_class_df$htn_med_class[med_class_df$pid %in% med_class_list_otherCombo$pid] = 'other_combo'
+  
   med_class_df = med_class_df %>%
-    dplyr::filter(.data$pid %in% med_class_list$pid)
+    dplyr::filter(.data$pid %in% med_class_list$pid) %>% 
+    dplyr::distinct()
   df = dplyr::inner_join(df, med_class_df %>% dplyr::select(-"value"))
   df = df %>% dplyr::select(-c("acei", "acei_diuretic", "acei_ccb", "arb", "arb_diuretic", "arb_ccb", "bb", "ccb", "diuretic", "acei_diuretic", "acei_ccb", "arb_ccb", "diuretic_combo", "ccb_combo"))
+
   df$htn_med_class[is.na(df$htn_med_class)] = 'other'
 
   ## Bound lab values
