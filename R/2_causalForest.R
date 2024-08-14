@@ -1,6 +1,3 @@
-# create results folder
-dir.create(file.path(path, 'results/step2_CF_analysis'))
-
 #' Performs causal forest to find factors contributing to effect heterogeneity
 #'
 #' @details

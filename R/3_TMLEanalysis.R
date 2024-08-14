@@ -1,6 +1,3 @@
-
-dir.create(file.path(path, 'results/step3_TMLE_analysis'))
-
 #' Create patient profiles
 #'
 #' @details

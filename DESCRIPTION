@@ -10,7 +10,8 @@ Maintainer: add name <addemail@here.com>
 Description: A study to investigate personalised causal inference
 License: Apache License 2.0
 Depends:
-	R (>= 4.0.0)
+	R (>= 4.0.0),
+	SuperLearner
 Imports:
   Andromeda,
 	DatabaseConnector (>= 6.3.1),
@@ -26,7 +27,7 @@ Imports:
 	caret,
 	cobalt,
 	mice,
-	SuperLearner, 
+	stats,
 	pROC,
 	Metrics,
 	ggplot2,

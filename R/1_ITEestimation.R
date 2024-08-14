@@ -1,7 +1,3 @@
-# create results folder
-path = getwd()
-dir.create(file.path(path, 'results/step1_ITE_estimation'), showWarnings = F)
-
 #' Performs Q-estimation for counterfactual predictions
 #'
 #' @details
@@ -34,25 +30,25 @@ step1_ite_SL = function(med_class_i, df, outcome)
 
   ## create med class comparisons
   df_comp = df
-  df_comp$htn_med_class[df_comp$htn_med_class != htn_med_list[med_class_i]] = 'other'
-  df_comp$htn_med_class = factor(df_comp$htn_med_class, levels = c('other', htn_med_list[med_class_i]))
+  df_comp$htn_med_class[df_comp$htn_med_class != med_class_i] = 'other'
+  df_comp$htn_med_class = factor(df_comp$htn_med_class, levels = c('other', med_class_i))
   person_id_df = df_comp$pid
 
   if (outcome == 'at_control_14090')
   {
-    X = df_comp %>% select(-pid, -sbp_change, -bmi_neg, -bp_14090, -bp_13080)
+    X = df_comp %>% dplyr::select(-"pid", -"sbp_change", -"bmi_neg", -"bp_14090", -"bp_13080")
     y = df_comp$bp_14090
     SL.family = 'binomial'
     SL.method = 'method.AUC'
   } else if (outcome == 'at_control_13080')
   {
-    X = df_comp %>% select(-pid, -sbp_change, -bmi_neg, -bp_14090, -bp_13080)
+    X = df_comp %>% dplyr::select(-"pid", -"sbp_change", -"bmi_neg", -"bp_14090", -"bp_13080")
     y = df_comp$bp_13080
     SL.family = 'binomial'
     SL.method = 'method.AUC'
   } else
   {
-    X = df_comp %>% select(-pid, -sbp_change, -bmi_neg, -bp_14090, -bp_13080)
+    X = df_comp %>% dplyr::select(-"pid", -"sbp_change", -"bmi_neg", -"bp_14090", -"bp_13080")
     y = df_comp$sbp_change
     SL.family = 'gaussian'
     SL.method = 'method.NNLS'
@@ -74,7 +70,7 @@ step1_ite_SL = function(med_class_i, df, outcome)
                         verbose = T)
 
   # obtain predictions
-  all.pred = predict(fit.sl)
+  all.pred = stats::predict(fit.sl)
   Yhat = data.frame(all.pred$pred)
   Yhat = Yhat$all.pred.pred
 
@@ -82,15 +78,15 @@ step1_ite_SL = function(med_class_i, df, outcome)
 
   # force intervention to control class
   X_0 = X
-  X_0$htn_med_class = factor('other', levels = c('other', htn_med_list[med_class_i]))
+  X_0$htn_med_class = factor("other", levels = c('other', med_class_i))
 
-  pred_0 = predict(fit.sl, newdata = X_0)
+  pred_0 = stats::predict(fit.sl, newdata = X_0, onlySL = T)
 
   # force intervention to comparison class
   X_1 = X
-  X_1$htn_med_class = factor(htn_med_list[med_class_i], levels = c('other', htn_med_list[med_class_i]))
+  X_1$htn_med_class = factor(med_class_i, levels = c('other', med_class_i))
 
-  pred_1 = predict(fit.sl, newdata = X_1)
+  pred_1 = stats::predict(fit.sl, newdata = X_1, onlySL = T)
 
   # calculate ite
   ite = as.data.frame(pred_1$pred - pred_0$pred)
@@ -104,19 +100,34 @@ step1_ite_SL = function(med_class_i, df, outcome)
   outcome_pred = rbind(pred_0, pred_1)
 
   outcome_pred$assignment = factor(outcome_pred$assignment)
-  outcomes_pred_plot = ggplot2::ggplot(outcome_pred, aes(x = pred, group = assignment, fill = assignment)) + geom_histogram(alpha = .8, position = 'identity') + theme_bw() + xlab('Y_hat') + ylab('Frequency') +
-    ggtitle(paste('Histogram of Y_hat:', outcome), subtitle = paste(htn_med_list[med_class_i]))
-  ggplot2::ggsave(file.path(path, paste0('results/step1_ITE_estimation/outcomes_pred_plot_', htn_med_list[med_class_i], '_', outcome, '_', '.png')), outcomes_pred_plot, width = 6, height = 4)
+  outcomes_pred_plot = ggplot2::ggplot(outcome_pred, ggplot2::aes(x = pred, group = assignment, fill = assignment)) +
+    ggplot2::geom_histogram(alpha = .8, position = 'identity') +
+    ggplot2::theme_bw() +
+    ggplot2::xlab('Y_hat') +
+    ggplot2::ylab('Frequency') +
+    ggplot2::ggtitle(paste('Histogram of Y_hat:', outcome), subtitle = paste(med_class_i))
+  #ggplot2::ggsave(file.path(path, paste0('results/step1_ITE_estimation/outcomes_pred_plot_', htn_med_list[med_class_i], '_', outcome, '_', '.png')), outcomes_pred_plot, width = 6, height = 4)
 
   # reporting statistics
-  ite_histogram = ggplot2::ggplot(ite, aes(x = ite)) + geom_histogram(fill = NA, color = 'black', alpha = .75) + xlab('ITE') + ylab('Frequency') + theme_bw() + geom_vline(xintercept = mean(ite$ite), color = 'red') +
-    ggtitle(paste('Histogram of ITE:', outcome), subtitle = paste('Medication Class:', htn_med_list[med_class_i], '     Mean:', round(mean(ite$ite),4)))
-  ggplot2::ggsave(file.path(path, paste0('results/step1_ITE_estimation/ite_histogram_', htn_med_list[med_class_i], '_', outcome, '_', '.png')), ite_histogram, width = 6, height = 4)
-  print(ite_histogram)
+  ite_histogram = ggplot2::ggplot(ite, ggplot2::aes(x = ite)) +
+    ggplot2::geom_histogram(fill = NA, color = 'black', alpha = .75) +
+    ggplot2::xlab('ITE') +
+    ggplot2::ylab('Frequency') +
+    ggplot2::theme_bw() +
+    ggplot2::geom_vline(xintercept = mean(ite$ite), color = 'red') +
+    ggplot2::ggtitle(paste('Histogram of ITE:', outcome), subtitle = paste('Medication Class:', med_class_i, '     Mean:', round(mean(ite$ite),4)))
+  #ggplot2::ggsave(file.path(path, paste0('results/step1_ITE_estimation/ite_histogram_', htn_med_list[med_class_i], '_', outcome, '_', '.png')), ite_histogram, width = 6, height = 4)
+  #print(ite_histogram)
 
   ite = cbind(person_id_df, ite)
 
-  return(ite)
+  return(
+    list(
+      ite = ite,
+      outcomesPredPlot = outcomes_pred_plot,
+      iteHistogram = ite_histogram
+    )
+  )
 }
 
 
