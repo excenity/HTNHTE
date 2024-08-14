@@ -98,6 +98,11 @@ executeStudy <- function(
 
   # final step
   if(runTreatmentEffects){
+
+    if(!file.exists(file.path(outputpath, 'data.rds'))){
+      message('No data - please run with extractingData = T first')
+    } else{
+      df <- readRDS(file.path(outputpath, 'data.rds'))
     cont_var = c('sbp', 'ldl', 'age', 'bmi')
 
     cutpoints = list(c(0, 150, 300),
@@ -122,12 +127,42 @@ executeStudy <- function(
     SL.library.chosen = c("SL.mean", "SL.glm", "SL.glm.interaction", enet$names, xgboost.learners$names, RF.learners$names)
 
     # TMLE Analysis for Main Outcomes
-    TMLE_analysis(outcome = 'at_control_14090', patient_profile_list)
-    TMLE_analysis(outcome = 'at_control_13080', patient_profile_list)
-    TMLE_analysis(outcome = 'sbp_change', patient_profile_list)
+    for(outcome in c('at_control_14090', 'at_control_13080','sbp_change')){
+      result <- TMLE_analysis(
+        outcome = outcome,
+        patient_profile_list = patient_profile_list,
+        htn_med_list = unique(df$htn_med_class)
+      )
+      if(!dir.exists(file.path(outputpath,'tmle_results_df'))){
+        dir.create(file.path(outputpath,'tmle_results_df'), recursive = T)
+      }
+      if(!dir.exists(file.path(outputpath,'tmle_plots'))){
+        dir.create(file.path(outputpath,'tmle_plots'), recursive = T)
+      }
+      write.csv(
+        x = result$tmleResultsDf,
+        file = file.path(outputpath,'tmle_results_df', paste0(outcome, '.csv')), row.names = F)
+      ggplot2::ggsave(
+        filename = file.path(outputpath,'tmle_plots', paste0(outcome, '.png')),
+        result$tmlePlot,
+        height = 16,
+        width = 30
+      )
+    }
+
 
     # TMLE Analysis for Negative Control Outcome
-    TMLE_analysis_neg()
+    result <- TMLE_analysis_neg(unique(df$htn_med_class))
+    write.csv(
+      x = result$tmleResultsDf,
+      file = file.path(outputpath,'tmle_results_df', paste0(outcome, '_bmi_neg.csv')), row.names = F)
+    ggplot2::ggsave(
+      filename = file.path(outputpath,'tmle_plots', paste0(outcome, '_bmi_neg.png')),
+      result$tmlePlot,
+      height = 16,
+      width = 30
+    )
+    }
   }
 
 }
