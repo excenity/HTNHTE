@@ -4,14 +4,12 @@
 \alias{CF_analysis}
 \title{Performs causal forest to find factors contributing to effect heterogeneity}
 \usage{
-CF_analysis(htn_med_class_i, df, outcome)
+CF_analysis(ite, htn_med_class_i, df)
 }
 \arguments{
 \item{htn_med_class_i}{The anti-hypertensive medication class of interest}
 
 \item{df}{The analytic dataset}
-
-\item{outcome}{The outcome of interest}
 }
 \value{
 Generates the feature importance plots for each medication class and outcome, also generates split values used by the CF algorithm

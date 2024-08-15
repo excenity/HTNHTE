@@ -4,10 +4,10 @@
 \alias{TMLE_analysis_neg}
 \title{Performs TMLE for the negative control outcome in the overall population}
 \usage{
-TMLE_analysis_neg()
+TMLE_analysis_neg(htn_med_list)
 }
 \arguments{
-\item{patient_profile_list}{list of patient profiles created description}
+\item{htn_med_list}{treatments}
 }
 \value{
 The ITE predictions

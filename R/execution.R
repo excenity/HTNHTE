@@ -1,3 +1,23 @@
+#' Executes the study analysis given database details
+#'
+#' @details
+#' Specify the database connection and schema details and then the study will execute
+#'
+#' @param connectionDetails connection details to the OMOP CDM database
+#' @param cdmDatabaseSchema The schema with the OMOP CDM database
+#' @param cohortDatabaseSchema A schema with read/write access that the cohort table will be written to
+#' @param cohortTable The name of the cohort table
+#' @param outputpath The location to save results to
+#' @param generateCohorts Whether to run SQL that creates the cohorts
+#' @param extractingData Whether to extract the study data using the cohorts
+#' @param runStatisticsAnalysis Whether to run the statistical analysis
+#' @param runTreatmentEffects Whether to run the treatment effects
+#'
+#' @return
+#' The cohorts are generated into the specified cohort schema and table
+#'
+#' @export
+#'
 executeStudy <- function(
     connectionDetails,
     cdmDatabaseSchema,
