@@ -1,6 +1,3 @@
-
-dir.create(file.path(path, 'results/step3_TMLE_analysis'))
-
 #' Create patient profiles
 #'
 #' @details
@@ -25,11 +22,15 @@ createPatientProfiles = function(cont_var, cutpoints, df)
     names(df)[names(df) == 'new_col'] = cont_var_names[i]
   }
 
-  df = df %>% unite(col = 'patient_profiles', all_of(c(cont_var_names)), remove = F)
+  df = df %>% tidyr::unite(
+    col = 'patient_profiles',
+    tidyr::all_of(c(cont_var_names)),
+    remove = F
+    )
 
   # get list of distinct patient profiles and corresponding variable categories
   patient_profile_list = df[,c('patient_profiles', cont_var_names)]
-  patient_profile_list = patient_profile_list %>% distinct()
+  patient_profile_list = patient_profile_list %>% dplyr::distinct()
 
   return(df)
 }
@@ -42,7 +43,7 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
   set.seed(618)
 
   # prepare dataset
-  X = df %>% select(c("age", "gender", "race", "hispanic", "dm", "ckd", "hf", "sleep_apnea", "antidepressants", "hormonal_therapy", "statins", "ppi", "dbp", "sbp", "chol", "ldl", "creatinine", "hba1c"))
+  X = df %>% dplyr::select(c("age", "gender", "race", "hispanic", "dm", "ckd", "hf", "sleep_apnea", "antidepressants", "hormonal_therapy", "statins", "ppi", "dbp", "sbp", "chol", "ldl", "creatinine", "hba1c"))
 
   if (outcome == 'at_control_14090')
   {
@@ -62,7 +63,17 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
     tmle_family = 'gaussian'
   }
 
+  # remove variables that are all same value
+  uniqueCount <- unlist(lapply(1:ncol(X), function(i) length(unique(X[,i]))))
+  if(length(uniqueCount == 1) > 0){
+    message('Removing columns: ', paste(colnames(X)[uniqueCount == 1], collapse = ' - '), ' as only have single value.')
+    X <- X[, uniqueCount > 1]
+  }
+
   # TMLE
+  # there is a bug in tmle where IC.ATC is not defined
+  #env <- environment(fun = tmle::tmle)
+  #env$IC.ATC <- NULL
   tmle_fit = tmle::tmle(Y = tmle_Y, #control_6months/SBP_diff_6months
                   A = intervention_levels,
                   W = X,
@@ -71,6 +82,8 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
                   family = tmle_family,
                   gbound = 0.05
   )
+
+
   return(tmle_fit)
 }
 
@@ -83,6 +96,7 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
 #'
 #' @param outcome The outcome of interest
 #' @param patient_profile_list list of patient profiles created description
+#' @param htn_med_list The different treatments
 #'
 #' @return
 #' The ITE predictions
@@ -90,10 +104,14 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
 #' @export
 #'
 #
-TMLE_analysis = function(outcome, patient_profile_list)
+TMLE_analysis = function(
+    outcome,
+    patient_profile_list,
+    htn_med_list
+    )
 {
   ### Create SL Learners
-  print(SL.library.chosen)
+  #print(SL.library.chosen)
 
   for (med_class_i in 1:length(htn_med_list))
   {
@@ -106,7 +124,9 @@ TMLE_analysis = function(outcome, patient_profile_list)
     for (patient_profile_i in 1:nrow(patient_profile_list))
     {
       # select patient profile
-      df_pp = df_med %>% filter(patient_profiles == patient_profile_list$patient_profiles[patient_profile_i]) %>% select(-patient_profiles)
+      df_pp = df_med %>%
+        dplyr::filter(patient_profiles == patient_profile_list$patient_profiles[patient_profile_i]) %>%
+        dplyr::select(-"patient_profiles")
       print(paste('patient_profile_index:', patient_profile_i))
 
       intervention = htn_med_list[med_class_i]
@@ -168,16 +188,25 @@ TMLE_analysis = function(outcome, patient_profile_list)
     {tmle_results_df = rbind(tmle_results_df, tmle_results_chunk)}
   }
 
-  write.csv(tmle_results_df, file.path(path, paste0('results/step3_TMLE_analysis/tmle_results_df_', outcome, '.csv')), row.names = F)
 
   ## ---- Visualize TMLE Results
 
   # Overview
-  TMLE_plot = ggplot2::ggplot(tmle_results_df, aes(x = htn_med_class, y = Q1_star_avg, color = htn_med_class)) + geom_point() + geom_linerange(aes(ymin=Q1_star_lb, ymax=Q1_star_ub)) +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + facet_wrap('patient_profiles') + theme_bw() + xlab('Hypertension Medication Class') + ylab('Predicted Treatment Effect')
-  ggplot2::ggsave(file.path(path, paste0('results/step3_TMLE_analysis/TMLE_plot_', outcome, '.png')), TMLE_plot, height = 16, width = 30)
+  TMLE_plot = ggplot2::ggplot(tmle_results_df, ggplot2::aes(x = htn_med_class, y = Q1_star_avg, color = htn_med_class)) +
+    ggplot2::geom_point() +
+    ggplot2::geom_linerange(ggplot2::aes(ymin=Q1_star_lb, ymax=Q1_star_ub)) +
+    ggplot2::theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+    ggplot2::facet_wrap('patient_profiles') +
+    ggplot2::theme_bw() +
+    ggplot2::xlab('Hypertension Medication Class') +
+    ggplot2::ylab('Predicted Treatment Effect')
 
-  return()
+  return(
+    list(
+      tmleResultsDf = tmle_results_df,
+      tmlePlot = TMLE_plot
+    )
+  )
 }
 
 
@@ -186,14 +215,14 @@ TMLE_analysis = function(outcome, patient_profile_list)
 #' @details
 #' Performs TMLE for the negative control outcome in the overall population
 #'
-#' @param patient_profile_list list of patient profiles created description
+#' @param htn_med_list treatments
 #'
 #' @return
 #' The ITE predictions
 #'
 #' @export
 #'
-TMLE_analysis_neg = function()
+TMLE_analysis_neg = function(htn_med_list)
 {
   for (med_class_i in 1:length(htn_med_list))
   {
@@ -245,14 +274,22 @@ TMLE_analysis_neg = function()
     {tmle_results_df = rbind(tmle_results_df, tmle_results)}
   }
 
-  write.csv(tmle_results_df, file.path(path, paste0('results/step3_TMLE_analysis/tmle_results_df_bmi_neg.csv')), row.names = F)
+  #write.csv(tmle_results_df, file.path(path, paste0('results/step3_TMLE_analysis/tmle_results_df_bmi_neg.csv')), row.names = F)
 
   # Overview
-  TMLE_plot = ggplot2::ggplot(tmle_results_df, aes(x = htn_med_class, y = Q1_star_avg, color = htn_med_class)) + geom_point() + geom_linerange(aes(ymin=Q1_star_lb, ymax=Q1_star_ub)) +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + theme_bw() + xlab('Hypertension Medication Class') + ylab('Predicted Treatment Effect')
-  ggplot2::ggsave(file.path(path, paste0('results/step3_TMLE_analysis/TMLE_plot_bmiNeg.png')), TMLE_plot, height = 8, width = 12)
+  TMLE_plot = ggplot2::ggplot(tmle_results_df, ggplot2::aes(x = htn_med_class, y = Q1_star_avg, color = htn_med_class)) +
+    ggplot2::geom_point() +
+    ggplot2::geom_linerange(ggplot2::aes(ymin=Q1_star_lb, ymax=Q1_star_ub)) +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) +
+    ggplot2::theme_bw() +
+    ggplot2::xlab('Hypertension Medication Class') +
+    ggplot2::ylab('Predicted Treatment Effect')
+  #ggplot2::ggsave(file.path(path, paste0('results/step3_TMLE_analysis/TMLE_plot_bmiNeg.png')), TMLE_plot, height = 8, width = 12)
 
-  return()
+  return(list(
+    tmleResultsDf = tmle_results_df,
+    tmlePlot = TMLE_plot
+  ))
 }
 
 

@@ -4,12 +4,14 @@
 \alias{TMLE_analysis}
 \title{Performs TMLE over all patient profiles}
 \usage{
-TMLE_analysis(outcome, patient_profile_list)
+TMLE_analysis(outcome, patient_profile_list, htn_med_list)
 }
 \arguments{
 \item{outcome}{The outcome of interest}
 
 \item{patient_profile_list}{list of patient profiles created description}
+
+\item{htn_med_list}{The different treatments}
 }
 \value{
 The ITE predictions
