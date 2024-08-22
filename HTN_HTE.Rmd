@@ -24,6 +24,29 @@ path = getwd()
 htn_med_list = c('acei', 'arb', 'ccb', 'diuretic', 'ccb_combo', 'diuretic_combo')
 ```
 
+```{r}
+##### PLEASE EDIT ##### 
+connectionDetails = createConnectionDetails(
+  dbms = "postgresql",
+  server = 'localhost/HTN_OMOP',
+  user = 'postgres',
+  password = '741China@',
+  pathToDriver = '/Users/excenity/Library/R/jdbcDrivers'
+)
+
+executeStudy(
+    connectionDetails = connectionDetails,
+    cdmDatabaseSchema = 'htnhte',
+    cohortDatabaseSchema = 'htnhte',
+    cohortTable = 'htn_hte',
+    outputpath = '/Users/excenity/Documents/HSIP/Research/Dissertation Project/Results/results_081824',
+    generateCohorts = T,
+    extractingData = T,
+    runStatisticsAnalysis = T,
+    runTreatmentEffects = F
+)
+```
+
 #### COHORT EXTRACTION ####
 
 INSTRUCTIONS: Edit connection details

@@ -34,8 +34,8 @@ executeStudy <- function(
     message('Generating cohorts for study')
     generateCohorts(
       connectionDetails = connectionDetails,
-      cdmDatabaseSchema = schema,
-      cohortDatabaseSchema = workSchema,
+      cdmDatabaseSchema = cdmDatabaseSchema,
+      cohortDatabaseSchema = cohortDatabaseSchema,
       cohortTable = cohortTable
     )
   }
@@ -46,9 +46,9 @@ executeStudy <- function(
     message('Extracting data')
     message('Part 1: downloading')
     df = HTNHTE::getData(
-      cdmDatabaseSchema = schema,
+      cdmDatabaseSchema = cdmDatabaseSchema,
       connectionDetails = connectionDetails,
-      cohortDatabaseSchema = workSchema,
+      cohortDatabaseSchema = cohortDatabaseSchema,
       cohortTable = 'htn_hte'
     )
     message('Part 2: processing')
