@@ -130,7 +130,7 @@ getMeasurementCovariateData <- function(
                             startDay = covariateSettings$startDay,
                             endDay = covariateSettings$endDay,
                             isBinary = "N",
-                            missingMeansZero = "Y")
+                            missingMeansZero = "N")
 
   result <- Andromeda::andromeda(covariates = covariates,
                                  covariateRef = covariateRef,

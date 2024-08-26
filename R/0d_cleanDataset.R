@@ -1,8 +1,3 @@
-
-#path = getwd()
-#dir.create(file.path(path, 'results'), showWarnings = F)
-#dir.create(file.path(path, 'results/step0_datasetCreation'), showWarnings = F)
-
 #' Clean and wrangle dataset for analysis
 #'
 #' @details
@@ -50,22 +45,9 @@ generateAnalyticDataset = function(
     }
   }
 
-  ## Exclusions
-
-  message(paste('N Initial Dataset', nrow(df)))
-  df = df %>% dplyr::filter(.data$age >= 18)
-  message(paste('N after removing those under age 18:', nrow(df)))
-  df = df %>% dplyr::filter(.data$sbp != 0 & .data$dbp != 0 )
-  message(paste('N after removing missing baseline BP measurement:', nrow(df)))
-  df = df %>% dplyr::filter(.data$sbp_6m != 0 & .data$dbp_6m != 0)
-  message(paste('N after removing missing outcome at 6 months:', nrow(df)))
-  df = df %>% dplyr::filter(.data$sbp >= 140 | .data$dbp >= 90)
-  message(paste('N after removing those at control at prescription:', nrow(df)))
-
   ## Wrangle Demographic Variables
 
-
-  # combine asian races
+  # combine Asian races
   df$asian = ifelse(df$asian + df$pacific_islander + df$american_indian + df$asian_indian + df$chinese +
                       df$filipino + df$japanese + df$korean + df$vietnamese + df$other_pacific >= 1, 1, 0)
   df = df %>% dplyr::select(-c('pacific_islander', 'american_indian', 'asian_indian', 'chinese', 'filipino', 'japanese', 'korean', 'vietnamese', 'other_pacific'))
@@ -75,7 +57,7 @@ generateAnalyticDataset = function(
     tidyr::pivot_longer(
       cols = c('asian', 'black', 'white'),
       values_to = 'race'
-      )
+    )
   race_df = race_df %>%
     dplyr::filter(.data$race == 1) %>%
     dplyr::select('pid', 'name')
@@ -93,6 +75,29 @@ generateAnalyticDataset = function(
   df$gender = df$male
   df = df %>% dplyr::select(-c('female', 'gender_unknown', 'male'))
 
+  ## outcomes missingness comparison
+  sink(file.path(outputpath, 'missingness_diff.txt'))
+  df_miss_outcome = df
+  col_repl = c('age', 'sbp', 'dbp', 'chol', 'ldl', 'creatinine', 'bmi_neg', 'hba1c', 'sbp_6m', 'dbp_6m', 'bmi')
+  df_miss_outcome[col_repl] = sapply(df_miss_outcome[col_repl], function(x) replace(x, x %in% c(0), NA))
+  df_miss_outcome$missing_outcome = ifelse(is.na(df_miss_outcome$sbp_6m) | is.na(df_miss_outcome$dbp_6m), 1, 0)
+  t1 = CreateTableOne(data = df_miss_outcome, strata = 'missing_outcome', test = F)
+  print(t1, smd = T)
+  remove(df_miss_outcome)
+  sink()
+
+  sink(file.path(outputpath, 'consort.txt'))
+  ## Exclusions
+  message(paste('N Initial Dataset', nrow(df)))
+  df = df %>% dplyr::filter(.data$age >= 18)
+  message(paste('N after removing those under age 18:', nrow(df)))
+  df = df %>% dplyr::filter(.data$sbp != 0 & .data$dbp != 0 )
+  message(paste('N after removing missing baseline BP measurement:', nrow(df)))
+  df = df %>% dplyr::filter(.data$sbp_6m != 0 & .data$dbp_6m != 0)
+  message(paste('N after removing missing outcome at 6 months:', nrow(df)))
+  df = df %>% dplyr::filter(.data$sbp >= 140 | .data$dbp >= 90)
+  message(paste('N after removing those at control at prescription:', nrow(df)))
+  sink()
 
   ## Medication Assignment
 
@@ -136,15 +141,15 @@ generateAnalyticDataset = function(
     #dplyr::filter(.data$n==1) %>%
     dplyr::filter(.data$n < 3) #%>%
     #dplyr::select("pid")
-  
+
   # new code added that had conflict
-  med_class_list_otherCombo = med_class_list %>% 
-  dplyr::filter(n == 2) %>% 
+  med_class_list_otherCombo = med_class_list %>%
+  dplyr::filter(n == 2) %>%
   dplyr::distinct("pid")
   med_class_df$htn_med_class[med_class_df$pid %in% med_class_list_otherCombo$pid] = 'other_combo'
-  
+
   med_class_df = med_class_df %>%
-    dplyr::filter(.data$pid %in% med_class_list$pid) %>% 
+    dplyr::filter(.data$pid %in% med_class_list$pid) %>%
     dplyr::distinct()
   df = dplyr::inner_join(df, med_class_df %>% dplyr::select(-"value"))
   df = df %>% dplyr::select(-c("acei", "acei_diuretic", "acei_ccb", "arb", "arb_diuretic", "arb_ccb", "bb", "ccb", "diuretic", "acei_diuretic", "acei_ccb", "arb_ccb", "diuretic_combo", "ccb_combo"))

@@ -27,7 +27,12 @@ executeStudy <- function(
     generateCohorts = T,
     extractingData = T,
     runStatisticsAnalysis = T,
-    runTreatmentEffects = F
+    runTreatmentEffects = F,
+    cont_var = c('sbp', 'ldl', 'age', 'bmi'),
+    cutpoints = list(c(0, 150, 300),
+                     c(0 ,100, 300),
+                     c(0, 65, 150),
+                     c(0, 30, 100))
 ){
 
   if(generateCohorts){
@@ -123,12 +128,6 @@ executeStudy <- function(
       message('No data - please run with extractingData = T first')
     } else{
       df <- readRDS(file.path(outputpath, 'data.rds'))
-    cont_var = c('sbp', 'ldl', 'age', 'bmi')
-
-    cutpoints = list(c(0, 150, 300),
-                     c(0 ,100, 300),
-                     c(0, 65, 150),
-                     c(0, 30, 100))
 
     # create patient profiles
     df = createPatientProfiles(cont_var, cutpoints, df)

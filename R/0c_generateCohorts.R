@@ -155,7 +155,7 @@ getData <- function(
     covariateName = 'BMI negControl',
     conceptSet = c(3038553),
     startDay = 30*1+1, endDay=30*6,
-    aggregateMethod = 'latest',
+    aggregateMethod = 'earliest',
     covariateId = 6466,
     analysisId = 466
   )
