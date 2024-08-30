@@ -30,7 +30,7 @@ connectionDetails = createConnectionDetails(
   dbms = "postgresql",
   server = 'localhost/HTN_OMOP',
   user = 'postgres',
-  password = '741China@',
+  password = '',
   pathToDriver = '/Users/excenity/Library/R/jdbcDrivers'
 )
 
