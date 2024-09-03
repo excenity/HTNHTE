@@ -79,7 +79,7 @@ executeStudy <- function(
       # STEP 1: Individual Treatment Effects (ITE) Estimation via G-estimation
       # STEP 2: Causal Forest to Identify Factors Contributing Most to Heterogeneity
       # get model for each unique(df$htn_med_class)
-      htnMedClasses <- unique(df$htn_med_class)
+      htnMedClasses <- htn_med_list
       for(htnMedClass in htnMedClasses){
         for(type in c('at_control_14090', 'at_control_13080', 'sbp_change')){
           message(paste0('running stat analysis part 1 for ', type))
@@ -150,7 +150,7 @@ executeStudy <- function(
       result <- TMLE_analysis(
         outcome = outcome,
         patient_profile_list = patient_profile_list,
-        htn_med_list = unique(df$htn_med_class)
+        htn_med_list = htn_med_list
       )
       if(!dir.exists(file.path(outputpath,'tmle_results_df'))){
         dir.create(file.path(outputpath,'tmle_results_df'), recursive = T)
