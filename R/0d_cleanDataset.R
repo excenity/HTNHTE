@@ -156,6 +156,8 @@ generateAnalyticDataset = function(
 
   df$htn_med_class[is.na(df$htn_med_class)] = 'other'
 
+  df = df %>% filter(!htn_med_class %in% c('other', 'other_combo'))
+
   ## Bound lab values
   # Bounding BMI, total cholesterol, and creatinine
   df$bmi[df$bmi < 12 | df$bmi > 100] = NA
@@ -213,7 +215,7 @@ generateAnalyticDataset = function(
   # SBP change in 6 months
   df$sbp_change = df$sbp_6m - df$sbp
 
-  # BP Goal 140/90
+  # BP Goals
   df$bp_14090 = ifelse(df$sbp_6m < 140 & df$dbp_6m < 90, 1, 0)
   df$bp_13080 = ifelse(df$sbp_6m < 130 & df$dbp_6m < 80, 1, 0)
 
@@ -226,6 +228,11 @@ generateAnalyticDataset = function(
   df = df %>% dplyr::mutate_at(factor_list, as.factor)
   df$htn_med_class = as.character(df$htn_med_class)
   df = df %>% dplyr::select(-c("sbp_6m", "dbp_6m"))
+
+  sink(file.path(outputpath, 'tableone.txt'))
+  t1 = tableoen::createTableOne(data = df)
+  print(t1)
+  sink()
 
   return(df)
 }

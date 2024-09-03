@@ -126,12 +126,14 @@ executeStudy <- function(
 
     if(!file.exists(file.path(outputpath, 'data.rds'))){
       message('No data - please run with extractingData = T first')
-    } else{
+    } else {
       df <- readRDS(file.path(outputpath, 'data.rds'))
 
     # create patient profiles
     df = createPatientProfiles(cont_var, cutpoints, df)
     patient_profile_list = df %>% dplyr::distinct(patient_profiles)
+
+    message(patient_profile_list)
 
     # random forest
     RF.learners = SuperLearner::create.Learner("SL.ranger", tune = list(mtry = 3, num.trees = 500))
@@ -144,6 +146,8 @@ executeStudy <- function(
     enet = SuperLearner::create.Learner("SL.glmnet", detailed_names = T, tune = list(alpha = seq(0, 1, length.out = 5)))
     # list libraries
     SL.library.chosen = c("SL.mean", "SL.glm", "SL.glm.interaction", enet$names, xgboost.learners$names, RF.learners$names)
+
+    message(htn_med_list)
 
     # TMLE Analysis for Main Outcomes
     for(outcome in c('at_control_14090', 'at_control_13080','sbp_change')){
