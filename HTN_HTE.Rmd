@@ -17,7 +17,6 @@ library(SqlRender)
 library(SuperLearner)
 library(tidyverse)
 
-
 # medication type list
 htn_med_list = c('acei', 'arb', 'ccb', 'diuretic', 'ccb_combo', 'diuretic_combo')
 ```
@@ -33,10 +32,24 @@ connectionDetails = createConnectionDetails(
   dbms = "postgresql",
   server = 'localhost/HTN_OMOP',
   user = 'postgres',
-  password = '',
+  password = '741China@',
   pathToDriver = '/Users/excenity/Library/R/jdbcDrivers'
 )
 
+
+executeStudy(
+    connectionDetails = connectionDetails,
+    cdmDatabaseSchema = 'htnhte',
+    cohortDatabaseSchema = 'htnhte',
+    cohortTable = 'htn_hte',
+    outputpath = '/Users/excenity/Documents/HSIP/Research/Dissertation Project/Results/results_081824',
+    generateCohorts = F,
+    extractingData = T,
+    runStatisticsAnalysis = F,
+    runTreatmentEffects = F,
+    cont_var = cont_var,
+    cutpoints = cutpoints
+)
 ```
 
 

@@ -81,22 +81,22 @@ generateAnalyticDataset = function(
   col_repl = c('age', 'sbp', 'dbp', 'chol', 'ldl', 'creatinine', 'bmi_neg', 'hba1c', 'sbp_6m', 'dbp_6m', 'bmi')
   df_miss_outcome[col_repl] = sapply(df_miss_outcome[col_repl], function(x) replace(x, x %in% c(0), NA))
   df_miss_outcome$missing_outcome = ifelse(is.na(df_miss_outcome$sbp_6m) | is.na(df_miss_outcome$dbp_6m), 1, 0)
-  t1 = CreateTableOne(data = df_miss_outcome, strata = 'missing_outcome', test = F)
+  t1 = tableone::CreateTableOne(data = df_miss_outcome, strata = 'missing_outcome', test = F)
   print(t1, smd = T)
   remove(df_miss_outcome)
   sink()
 
   sink(file.path(outputpath, 'consort.txt'))
   ## Exclusions
-  message(paste('N Initial Dataset', nrow(df)))
+  print(paste('N Initial Dataset', nrow(df)))
   df = df %>% dplyr::filter(.data$age >= 18)
-  message(paste('N after removing those under age 18:', nrow(df)))
+  print(paste('N after removing those under age 18:', nrow(df)))
   df = df %>% dplyr::filter(.data$sbp != 0 & .data$dbp != 0 )
-  message(paste('N after removing missing baseline BP measurement:', nrow(df)))
+  print(paste('N after removing missing baseline BP measurement:', nrow(df)))
   df = df %>% dplyr::filter(.data$sbp_6m != 0 & .data$dbp_6m != 0)
-  message(paste('N after removing missing outcome at 6 months:', nrow(df)))
+  print(paste('N after removing missing outcome at 6 months:', nrow(df)))
   df = df %>% dplyr::filter(.data$sbp >= 140 | .data$dbp >= 90)
-  message(paste('N after removing those at control at prescription:', nrow(df)))
+  print(paste('N after removing those at control at prescription:', nrow(df)))
   sink()
 
   ## Medication Assignment
@@ -185,7 +185,7 @@ generateAnalyticDataset = function(
   df[, norm_vars] = norm_df
 
   ## Missing Imputation
-  mice_df = mice::mice(df %>% dplyr::select(-c("pid")), m = 1, maxit = 100, method = 'pmm', seed = 618, verbose = F)
+  mice_df = mice::mice(df %>% dplyr::select(-c("pid")), m = 1, maxit = 1000, method = 'pmm', seed = 618, verbose = F)
   png(file.path(outputpath, 'imputation.png'), width = 800, height = 600)
   mice::densityplot(mice_df)
   dev.off()
