@@ -82,7 +82,7 @@ CF_analysis = function(ite, htn_med_class_i, df)
   split_values_df = dplyr::left_join(split_values_df, X_headers)
   table(split_values_df$`names(X)`)
   names(split_values_df) = c('split_vars_i', 'split_value', 'split_var_name')
-  split_vars_list = as.data.frame(split_values_df %>% distinct(split_var_name))
+  split_vars_list = as.data.frame(split_values_df %>% dplyr::distinct(split_var_name))
 
   #dir.create(file.path(path, paste0('results/step2_CF_analysis/',  outcome, '_', htn_med_class_i)))
 
