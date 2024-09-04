@@ -28,6 +28,7 @@ executeStudy <- function(
     extractingData = T,
     runStatisticsAnalysis = T,
     runTreatmentEffects = F,
+    htn_med_list = c('acei', 'arb', 'ccb', 'diuretic', 'ccb_combo', 'diuretic_combo'),
     cont_var = c('sbp', 'ldl', 'age', 'bmi'),
     cutpoints = list(c(0, 150, 300),
                      c(0 ,100, 300),
@@ -79,7 +80,7 @@ executeStudy <- function(
       # STEP 1: Individual Treatment Effects (ITE) Estimation via G-estimation
       # STEP 2: Causal Forest to Identify Factors Contributing Most to Heterogeneity
       # get model for each unique(df$htn_med_class)
-      htnMedClasses <- htn_med_list
+      htnMedClasses <- unique(df$htn_med_class)
       for(htnMedClass in htnMedClasses){
         for(type in c('at_control_14090', 'at_control_13080', 'sbp_change')){
           message(paste0('running stat analysis part 1 for ', type))
