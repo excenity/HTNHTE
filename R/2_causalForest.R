@@ -97,7 +97,7 @@ CF_analysis = function(ite, htn_med_class_i, df)
     #ggplot2::ggsave(file.path(path, paste0('results/step2_CF_analysis/',  outcome, '_', htn_med_class_i, '/split_values_', i, '.png')), split_plot, width = 8, height = 6)
   }
 
-  split_values_df = split_values_df %>% dplyr::group_by(split_var_name) %>% dplyr::summarise_at(vars(split_value), list(mean, sd))
+  split_values_df = split_values_df %>% dplyr::group_by(split_var_name) %>% dplyr::summarise_at(dplyr::vars(split_value), list(mean, sd))
   #write.csv(split_values_df, file.path(path, paste0('results/step2_CF_analysis/',  outcome, '_', htn_med_class_i, '/split_values.csv')), row.names = F)
 
   return(
