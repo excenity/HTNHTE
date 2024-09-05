@@ -70,6 +70,22 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
     X <- X[, uniqueCount > 1]
   }
 
+  ### Create SL Learners
+
+  # random forest
+  RF.learners = SuperLearner::create.Learner("SL.ranger", tune = list(mtry = 3, num.trees = 500))
+  # xgboost
+  tune = list(ntrees = c(5, 10, 15),
+              max_depth = 2:5,
+              eta = c(0.1, 0.05, 0.01))
+  xgboost.learners = SuperLearner::create.Learner("SL.xgboost", tune = tune, detailed_names = TRUE, name_prefix = "xgb")
+  # elastic net
+  enet = SuperLearner::create.Learner("SL.glmnet", detailed_names = T, tune = list(alpha = seq(0, 1, length.out = 5)))
+  # list libraries
+  SL.library.chosen = c("SL.mean", "SL.glm", "SL.glm.interaction", enet$names, xgboost.learners$names, RF.learners$names)
+
+  #print(SL.library.chosen)
+
   # TMLE
   # there is a bug in tmle where IC.ATC is not defined
   #env <- environment(fun = tmle::tmle)
@@ -82,7 +98,6 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
                   family = tmle_family,
                   gbound = 0.05
   )
-
 
   return(tmle_fit)
 }
@@ -105,13 +120,13 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
 #'
 #
 TMLE_analysis = function(
+    df,
     outcome,
     patient_profile_list,
     htn_med_list
     )
 {
-  ### Create SL Learners
-  #print(SL.library.chosen)
+
 
   for (med_class_i in 1:length(htn_med_list))
   {
