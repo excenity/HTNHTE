@@ -89,7 +89,7 @@ CF_analysis = function(ite, htn_med_class_i, df)
   split_plot <- list()
   for (i in 1:nrow(split_vars_list))
   {
-    split_chunk = split_values_df %>% filter(split_var_name == split_vars_list[i,])
+    split_chunk = split_values_df %>% dplyr::filter(split_var_name == split_vars_list[i,])
     split_plot[[length(split_plot) + 1]] = ggplot2::ggplot(split_chunk, ggplot2::aes(x=split_value)) +
       ggplot2::geom_histogram() +
       ggplot2::ggtitle(split_vars_list[i,]) +
@@ -97,7 +97,7 @@ CF_analysis = function(ite, htn_med_class_i, df)
     #ggplot2::ggsave(file.path(path, paste0('results/step2_CF_analysis/',  outcome, '_', htn_med_class_i, '/split_values_', i, '.png')), split_plot, width = 8, height = 6)
   }
 
-  split_values_df = split_values_df %>% group_by(split_var_name) %>% summarise_at(vars(split_value), list(mean, sd))
+  split_values_df = split_values_df %>% dplyr::group_by(split_var_name) %>% dplyr::summarise_at(vars(split_value), list(mean, sd))
   #write.csv(split_values_df, file.path(path, paste0('results/step2_CF_analysis/',  outcome, '_', htn_med_class_i, '/split_values.csv')), row.names = F)
 
   return(

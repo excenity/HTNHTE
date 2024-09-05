@@ -156,7 +156,7 @@ generateAnalyticDataset = function(
 
   df$htn_med_class[is.na(df$htn_med_class)] = 'other'
 
-  df = df %>% filter(!htn_med_class %in% c('other', 'other_combo'))
+  df = df %>% dplyr::filter(!htn_med_class %in% c('other', 'other_combo'))
 
   ## Bound lab values
   # Bounding BMI, total cholesterol, and creatinine
