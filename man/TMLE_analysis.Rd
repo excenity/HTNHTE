@@ -4,7 +4,7 @@
 \alias{TMLE_analysis}
 \title{Performs TMLE over all patient profiles}
 \usage{
-TMLE_analysis(outcome, patient_profile_list, htn_med_list)
+TMLE_analysis(df, outcome, patient_profile_list, htn_med_list)
 }
 \arguments{
 \item{outcome}{The outcome of interest}

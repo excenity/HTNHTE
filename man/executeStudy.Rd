@@ -14,6 +14,7 @@ executeStudy(
   extractingData = T,
   runStatisticsAnalysis = T,
   runTreatmentEffects = F,
+  htn_med_list = c("acei", "arb", "ccb", "diuretic", "ccb_combo", "diuretic_combo"),
   cont_var = c("sbp", "ldl", "age", "bmi"),
   cutpoints = list(c(0, 150, 300), c(0, 100, 300), c(0, 65, 150), c(0, 30, 100))
 )

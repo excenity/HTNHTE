@@ -187,7 +187,7 @@ generateAnalyticDataset = function(
   df[, norm_vars] = norm_df
 
   ## Missing Imputation
-  mice_df = mice::mice(df %>% dplyr::select(-c("pid")), m = 1, maxit = 1000, method = 'pmm', seed = 618, verbose = F)
+  mice_df = mice::mice(df %>% dplyr::select(-c("pid")), m = 1, maxit = 100, method = 'pmm', seed = 618, verbose = F)
   png(file.path(outputpath, 'imputation.png'), width = 800, height = 600)
   mice::densityplot(mice_df)
   dev.off()
@@ -230,7 +230,7 @@ generateAnalyticDataset = function(
   df = df %>% dplyr::select(-c("sbp_6m", "dbp_6m"))
 
   sink(file.path(outputpath, 'tableone.txt'))
-  t1 = tableone::createTableOne(data = df)
+  t1 = tableone::CreateTableOne(data = df)
   print(t1)
   sink()
 
