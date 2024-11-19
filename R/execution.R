@@ -134,7 +134,8 @@ executeStudy <- function(
     df = createPatientProfiles(cont_var, cutpoints, df)
     patient_profile_list = df %>% dplyr::distinct(patient_profiles)
 
-    # TMLE Analysis for Main Outcomes
+
+    ### TMLE Analysis for Main Outcomes
     for(outcome in c('at_control_14090', 'at_control_13080','sbp_change')){
       result <- TMLE_analysis(
         df = df,

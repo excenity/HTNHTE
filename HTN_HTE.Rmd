@@ -43,12 +43,11 @@ executeStudy(
     cohortDatabaseSchema = 'htnhte',
     cohortTable = 'htn_hte',
     outputpath = '/Users/excenity/Documents/HSIP/Research/Dissertation Project/Results/results_081824',
-    generateCohorts = F,
-    extractingData = F,
+    generateCohorts = T,
+    extractingData = T,
     runStatisticsAnalysis = F,
-    runTreatmentEffects = T
+    runTreatmentEffects = F
 )
-
 ```
 
 
@@ -64,6 +63,22 @@ cutpoints = list(c(0, 150, 300),
                  c(0 ,100, 300),
                  c(0, 65, 150),
                  c(0, 30, 100))
+
+
+### Create Learners for SL
+# random forest
+RF.learners = SuperLearner::create.Learner("SL.ranger", tune = list(mtry = 3, num.trees = 500), detailed_names = T)
+# xgboost
+tune = list(ntrees = c(5, 10, 15),
+            max_depth = 2:5,
+            eta = c(0.1, 0.05, 0.01))
+xgboost.learners = SuperLearner::create.Learner("SL.xgboost", tune = tune, detailed_names = T, name_prefix = "xgb")
+# elastic net
+enet = SuperLearner::create.Learner("SL.glmnet", detailed_names = T, tune = list(alpha = seq(0, 1, length.out = 5)))
+# list libraries
+SL.library.chosen = c("SL.mean", "SL.glm", "SL.glm.interaction", RF.learners$names, xgboost.learners$names, enet$names)
+
+print(SL.library.chosen)
 
 
 executeStudy(

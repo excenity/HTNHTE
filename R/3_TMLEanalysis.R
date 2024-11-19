@@ -70,21 +70,18 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
     X <- X[, uniqueCount > 1]
   }
 
-  ### Create SL Learners
-
-  # random forest
-  RF.learners = SuperLearner::create.Learner("SL.ranger", tune = list(mtry = 3, num.trees = 500))
-  # xgboost
-  tune = list(ntrees = c(5, 10, 15),
-              max_depth = 2:5,
-              eta = c(0.1, 0.05, 0.01))
-  xgboost.learners = SuperLearner::create.Learner("SL.xgboost", tune = tune, detailed_names = TRUE, name_prefix = "xgb")
-  # elastic net
-  enet = SuperLearner::create.Learner("SL.glmnet", detailed_names = T, tune = list(alpha = seq(0, 1, length.out = 5)))
-  # list libraries
-  SL.library.chosen = c("SL.mean", "SL.glm", "SL.glm.interaction", enet$names, xgboost.learners$names, RF.learners$names)
-
-  #print(SL.library.chosen)
+  # # random forest
+  # RF.learners = SuperLearner::create.Learner("SL.ranger", tune = list(mtry = 3, num.trees = 500), detailed_names = T)
+  # # xgboost
+  # tune = list(ntrees = c(5, 10, 15),
+  #             max_depth = 2:5,
+  #             eta = c(0.1, 0.05, 0.01))
+  # xgboost.learners = SuperLearner::create.Learner("SL.xgboost", tune = tune, detailed_names = T, name_prefix = "xgb")
+  # # elastic net
+  # enet = SuperLearner::create.Learner("SL.glmnet", detailed_names = T, tune = list(alpha = seq(0, 1, length.out = 5)))
+  # # list libraries
+  # SL.library.chosen = c("SL.mean", "SL.glm", "SL.glm.interaction", RF.learners$names, xgboost.learners$names, enet$names)
+  # print(SL.library.chosen)
 
   # TMLE
   # there is a bug in tmle where IC.ATC is not defined
