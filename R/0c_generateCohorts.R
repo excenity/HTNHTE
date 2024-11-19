@@ -113,7 +113,7 @@ getData <- function(
 
   measurementFeature1 <- createMeasurementCovariateSettings(
     covariateName = 'SBP baseline',
-    conceptSet = c(3004249),
+    conceptSet = c(3004249, 4152194),
     startDay = -30*6, endDay=0,
     aggregateMethod = 'latest',
     covariateId = 1466,
@@ -121,7 +121,7 @@ getData <- function(
   )
   measurementFeature2 <- createMeasurementCovariateSettings(
     covariateName = 'DBP baseline',
-    conceptSet = c(3012888),
+    conceptSet = c(3012888, 4154790),
     startDay = -30*6, endDay=0,
     aggregateMethod = 'latest',
     covariateId = 2466,
@@ -129,7 +129,7 @@ getData <- function(
   )
   measurementFeature3 <- createMeasurementCovariateSettings(
     covariateName = 'total_cholesterol baseline',
-    conceptSet = c(3019900, 3027114),
+    conceptSet = c(4008265, 3027114),
     startDay = -30*6, endDay=0,
     aggregateMethod = 'latest',
     covariateId = 3466,
@@ -137,7 +137,7 @@ getData <- function(
   )
   measurementFeature4 <- createMeasurementCovariateSettings(
     covariateName = 'LDL baseline',
-    conceptSet = c(3001308,3009966,3035899,3035009,36032416,36031267,36031404,927157,42870529,40758569,3039873,3053341,3038988,4041556,4210878,3008631,3028288,3028437),
+    conceptSet = c(3028288, 4191837, 3028437, 40760809, 3009966, 3035899, 4041556),
     startDay = -30*6, endDay=0,
     aggregateMethod = 'latest',
     covariateId = 4466,
@@ -145,7 +145,7 @@ getData <- function(
   )
   measurementFeature5 <- createMeasurementCovariateSettings(
     covariateName = 'creatinine baseline',
-    conceptSet = c(3016723,3020564),
+    conceptSet = c(3016723, 4324383, 4013964, 3017250, 3016662),
     startDay = -30*6, endDay=0,
     aggregateMethod = 'latest',
     covariateId = 5466,
@@ -153,7 +153,7 @@ getData <- function(
   )
   measurementFeature6 <- createMeasurementCovariateSettings(
     covariateName = 'BMI negControl',
-    conceptSet = c(3038553),
+    conceptSet = c(3038553, 44783982),
     startDay = 30*1+1, endDay=30*6,
     aggregateMethod = 'earliest',
     covariateId = 6466,
@@ -161,7 +161,7 @@ getData <- function(
   )
   measurementFeature7 <- createMeasurementCovariateSettings(
     covariateName = 'hba1c baseline',
-    conceptSet = c(3004410),
+    conceptSet = c(3004410, 4184637, 3034639),
     startDay = -30*6, endDay=0,
     aggregateMethod = 'latest',
     covariateId = 7466,
@@ -170,7 +170,7 @@ getData <- function(
 
   measurementFeature8 <- createMeasurementCovariateSettings(
     covariateName = 'SBP 6 Months',
-    conceptSet = c(3004249),
+    conceptSet = c(3004249, 4152194),
     startDay = 30*1+1, endDay=30*6,
     aggregateMethod = 'latest',
     covariateId = 8466,
@@ -179,7 +179,7 @@ getData <- function(
 
   measurementFeature9 <- createMeasurementCovariateSettings(
     covariateName = 'DBP 6 months',
-    conceptSet = c(3012888),
+    conceptSet = c(3012888, 4154790),
     startDay = 30*1+1, endDay=30*6,
     aggregateMethod = 'latest',
     covariateId = 9466,
@@ -188,7 +188,7 @@ getData <- function(
 
   measurementFeature10 <- createMeasurementCovariateSettings(
     covariateName = 'BMI baseline',
-    conceptSet = c(3038553),
+    conceptSet = c(3038553, 44783982),
     startDay = -30*6, endDay=0,
     aggregateMethod = 'latest',
     covariateId = 10466,

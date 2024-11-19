@@ -44,12 +44,11 @@ executeStudy(
     cohortTable = 'htn_hte',
     outputpath = '/Users/excenity/Documents/HSIP/Research/Dissertation Project/Results/results_081824',
     generateCohorts = F,
-    extractingData = T,
+    extractingData = F,
     runStatisticsAnalysis = F,
-    runTreatmentEffects = F,
-    cont_var = cont_var,
-    cutpoints = cutpoints
+    runTreatmentEffects = T
 )
+
 ```
 
 
