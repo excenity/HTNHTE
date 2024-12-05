@@ -42,10 +42,10 @@ executeStudy(
     cdmDatabaseSchema = 'htnhte',
     cohortDatabaseSchema = 'htnhte',
     cohortTable = 'htn_hte',
-    outputpath = '/Users/excenity/Documents/HSIP/Research/Dissertation Project/Results/results_081824',
+    outputpath = '/Users/excenity/Documents/HSIP/Research/Dissertation Project/Results/results_120424',
     generateCohorts = T,
     extractingData = T,
-    runStatisticsAnalysis = F,
+    runStatisticsAnalysis = T,
     runTreatmentEffects = F
 )
 ```

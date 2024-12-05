@@ -87,11 +87,12 @@ generateAnalyticDataset = function(
   sink()
 
   sink(file.path(outputpath, 'consort.txt'))
+
   ## Exclusions
   print(paste('N Initial Dataset', nrow(df)))
   df = df %>% dplyr::filter(.data$age >= 18)
   print(paste('N after removing those under age 18:', nrow(df)))
-  df = df %>% dplyr::filter(.data$sbp != 0 & .data$dbp != 0 )
+  df = df %>% dplyr::filter(.data$sbp != 0 & .data$dbp != 0)
   print(paste('N after removing missing baseline BP measurement:', nrow(df)))
   df = df %>% dplyr::filter(.data$sbp_6m != 0 & .data$dbp_6m != 0)
   print(paste('N after removing missing outcome at 6 months:', nrow(df)))
@@ -114,12 +115,8 @@ generateAnalyticDataset = function(
   df$ccb_combo = ifelse(df$acei_ccb == 1 | df$arb_ccb == 1, 1, 0)
 
   # remove those with more than 3 classes
-
-  #df = df %>% dplyr::filter(diuretic_combo + ccb < 2 | diuretic_combo + bb < 2)
-  #df = df %>% dplyr::filter(ccb_combo + diuretic < 2 | ccb_combo + bb < 2)
   df = df %>% dplyr::filter(diuretic_combo + ccb + bb < 2)
   df = df %>% dplyr::filter(ccb_combo + diuretic + bb < 2)
-
 
   # reset single medication classes for dual therapies
   df$acei[df$diuretic_combo == 1 | df$ccb_combo == 1] = 0
@@ -128,6 +125,7 @@ generateAnalyticDataset = function(
   df$diuretic[df$diuretic_combo == 1 | df$ccb_combo == 1] = 0
 
   ## combine variables
+
   med_class_df = df %>%
     dplyr::select("pid", "acei", "arb", "bb", "ccb", "diuretic", "ccb_combo", "diuretic_combo") %>%
     tidyr::pivot_longer(
@@ -158,17 +156,7 @@ generateAnalyticDataset = function(
 
   df = df %>% dplyr::filter(!htn_med_class %in% c('other', 'other_combo'))
 
-  ## Bound lab values
-  # Bounding BMI, total cholesterol, and creatinine
-  df$bmi[df$bmi < 12 | df$bmi > 100] = NA
-  df$bmi_neg[df$bmi_neg < 12 | df$bmi_neg > 100] = NA
-  df$chol[df$chol < 100 | df$chol > 300] = NA
-  df$ldl[df$ldl < 10 | df$ldl > 250] = NA
-  df$hba1c[df$hba1c < 4.5] = 5
-  df$hba1c[df$hba1c > 15] = 15
-  df$creatinine[df$creatinine < 0.5  | df$creatinine > 5] = NA
-
-  ### MISSINGNESS ###
+  ### MISSINGNESS (BMI) ###
 
   ## missingness visualizations and tables
 
@@ -180,8 +168,38 @@ generateAnalyticDataset = function(
   print(colSums(is.na(df)))
   sink()
 
+  ## Bound lab values
+
+  # Bounding BMI, total cholesterol, and creatinine
+  df$bmi[df$bmi == 0] = NA
+  df$bmi[df$bmi < 12] = 12
+  df$bmi[df$bmi > 100] = 100
+  df$bmi_neg[df$bmi_neg == 0] = NA
+  df$bmi_neg[df$bmi_neg < 12] = 12
+  df$bmi_neg[df$bmi_neg > 100] = 100
+
+  df$bmi_neg[df$bmi_neg < 12] = 12
+  df$bmi_neg[df$bmi_neg > 100] = 100
+
+  df$hba1c[df$hba1c < 4.5] = 5
+  df$hba1c[df$hba1c > 15] = 15
+
+  ## Lab Panel Assignment (Creatinine, Total Cholesterol, LDL-C)
+
+  df$creatinine[df$creatinine == 0 | df$creatinine > 3] = NA
+  df$creatinine[is.na(df$creatinine)] = mean(df$creatinine, na.rm = T)
+
+  df$chol[df$chol == 0 ] = NA
+  df$chol[df$chol > 400] = 400
+  df$chol[is.na(df$chol)] = mean(df$chol, na.rm = T)
+  df$hyperlipid[df$chol > 240] = 1
+
+  df$ldl[df$ldl == 0 ] = NA
+  df$ldl[df$ldl > 250] = 250
+  df$ldl[is.na(df$ldl)] = mean(df$ldl, na.rm = T)
+
   # normalization
-  norm_vars = c('bmi', 'chol', 'creatinine', 'bmi_neg', 'ldl')
+  norm_vars = c('bmi', 'bmi_neg')
   norm_process = caret::preProcess(df %>% dplyr::select(norm_vars), method = 'range')
   norm_df = stats::predict(norm_process, df %>% dplyr::select(norm_vars))
   df[, norm_vars] = norm_df

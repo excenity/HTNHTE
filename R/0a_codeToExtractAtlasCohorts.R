@@ -47,7 +47,8 @@ extractCohortDefinitionSet <- function(saveLocation){
     cohortIds =  c(1789836, 1789837, 1789838, 1789839,
                    1789832, 1789840, 1789841, 1789842,
                    1790266, 1789829, 1789830, 1789833,
-                   1789834, 1789848, 1789849, 1789852
+                   1789834, 1789848, 1789849, 1789852,
+                   1791469, 1791470
     ),
     generateStats = TRUE,
     baseUrl = 'https://api.ohdsi.org/WebAPI'
@@ -59,4 +60,5 @@ extractCohortDefinitionSet <- function(saveLocation){
   return(invisible(T))
 }
 
+#extractCohortDefinitionSet('inst')
 

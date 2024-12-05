@@ -96,14 +96,15 @@ getData <- function(
       1789836, 1789837, 1789838, 1789839,
       1789832, 1789840, 1789841, 1789842,
       1789829, 1789830, 1789833, 1789834,
-      1789848, 1789849, 1789850, 1789851, 1789852
+      1789848, 1789849, 1789850, 1789851,
+      1789852, 1791469, 1791470
       ),
   cohortName = c(
     'T2DM', 'CKD', 'Sleep_Apnea', 'HF',
     'antidepressants', 'hormonal_therapy', 'statins', 'PPI',
     'acei', 'acei_diuretic', 'arb',  'arb_diuretic',
     'beta_blockers', 'ccb', 'ccb_acei',
-    'ccb_arb', 'diuretics'
+    'ccb_arb', 'diuretics', 'hyperlipidemia', 'hypercholesterolemia'
   )
   ),
     valueType = "binary",
@@ -145,7 +146,7 @@ getData <- function(
   )
   measurementFeature5 <- createMeasurementCovariateSettings(
     covariateName = 'creatinine baseline',
-    conceptSet = c(3016723, 4324383, 4013964, 3017250, 3016662),
+    conceptSet = c(3016723, 4324383, 4013964),
     startDay = -30*6, endDay=0,
     aggregateMethod = 'latest',
     covariateId = 5466,

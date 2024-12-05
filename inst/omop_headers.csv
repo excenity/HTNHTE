@@ -36,6 +36,8 @@ cohort during day -365 through 0 days relative to index: PPI,ppi
 cohort during day -365 through 0 days relative to index: beta_blockers,bb
 cohort during day -365 through 0 days relative to index: ccb,ccb
 cohort during day -365 through 0 days relative to index: diuretics,diuretic
+cohort during day -365 through 0 days relative to index: hyperlipidemia,hyperlipid
+cohort during day -365 through 0 days relative to index: hypercholesterolemia,hyperchol
 ethnicity = Hispanic or Latino,hispanic
 ethnicity = Not Hispanic or Latino,non-hispanic
 race = Asian Indian,asian_indian
