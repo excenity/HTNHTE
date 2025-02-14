@@ -31,6 +31,7 @@ generateAnalyticDataset = function(
 
   headers = read.csv(system.file('omop_headers.csv', package = 'HTNHTE'))
   headersInData = dplyr::inner_join(headers, df_headers)
+  print('First Join completed')
 
   # restrict to columns in the csv file
   df <- df[,headersInData$columnId]
