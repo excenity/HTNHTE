@@ -27,8 +27,9 @@ generateAnalyticDataset = function(
   # creating dataframe and headers
   df = as.data.frame(as.matrix(data$dataMatrix))
   df_headers = as.data.frame(data$covariateRef)
+  print(head(df_headers))
 
-  headers = read.csv(system.file('omop_headers.csv',package = 'HTNHTE'))
+  headers = read.csv(system.file('omop_headers.csv', package = 'HTNHTE'))
   headersInData = dplyr::inner_join(headers, df_headers)
 
   # restrict to columns in the csv file
