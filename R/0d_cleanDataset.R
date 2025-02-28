@@ -80,7 +80,7 @@ generateAnalyticDataset = function(
   ## outcomes missingness comparison
   sink(file.path(outputpath, 'missingness_diff.txt'))
   df_miss_outcome = df
-  col_repl = c('age', 'sbp', 'dbp', 'chol', 'ldl', 'creatinine', 'bmi_neg', 'hba1c', 'sbp_6m', 'dbp_6m', 'bmi')
+  col_repl = c('age', 'sbp', 'dbp', 'chol', 'ldl', 'bmi_neg', 'hba1c', 'sbp_6m', 'dbp_6m', 'bmi')#, 'creatinine')
   df_miss_outcome[col_repl] = sapply(df_miss_outcome[col_repl], function(x) replace(x, x %in% c(0), NA))
   df_miss_outcome$missing_outcome = ifelse(is.na(df_miss_outcome$sbp_6m) | is.na(df_miss_outcome$dbp_6m), 1, 0)
   t1 = tableone::CreateTableOne(data = df_miss_outcome, strata = 'missing_outcome', test = F)
@@ -188,8 +188,8 @@ generateAnalyticDataset = function(
 
   ## Lab Panel Assignment (Creatinine, Total Cholesterol, LDL-C)
 
-  df$creatinine[df$creatinine == 0 | df$creatinine > 3] = NA
-  df$creatinine[is.na(df$creatinine)] = mean(df$creatinine, na.rm = T)
+  # df$creatinine[df$creatinine == 0 | df$creatinine > 3] = NA
+  # df$creatinine[is.na(df$creatinine)] = mean(df$creatinine, na.rm = T)
 
   df$chol[df$chol == 0 ] = NA
   df$chol[df$chol > 400] = 400
