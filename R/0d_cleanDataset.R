@@ -199,9 +199,10 @@ generateAnalyticDataset = function(
   df$ldl[df$ldl == 0 ] = NA
   df$ldl[df$ldl > 250] = 250
   df$ldl[is.na(df$ldl)] = mean(df$ldl, na.rm = T)
+  df$hyperchold[df$ldd > 130] = 1
 
   # normalization
-  norm_vars = c('bmi', 'bmi_neg')
+  norm_vars = c('bmi', 'bmi_neg', 'hba1c')
   norm_process = caret::preProcess(df %>% dplyr::select(norm_vars), method = 'range')
   norm_df = stats::predict(norm_process, df %>% dplyr::select(norm_vars))
   df[, norm_vars] = norm_df
