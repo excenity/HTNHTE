@@ -33,7 +33,7 @@ connectionDetails = createConnectionDetails(
   dbms = "postgresql",
   server = 'localhost/HTN_OMOP',
   user = 'postgres',
-  password = default_backend(),
+  password = key_get('HTN_OMOP'),
   pathToDriver = '/Users/excenity/Library/R/jdbcDrivers'
 )
 
@@ -44,9 +44,9 @@ executeStudy(
     cdmDatabaseSchema = 'htnhte',
     cohortDatabaseSchema = 'htnhte',
     cohortTable = 'htn_hte',
-    outputpath = '/Users/excenity/Documents/HSIP/Research/Dissertation Project/Results/results_022825',
-    generateCohorts = F,
-    extractingData = F,
+    outputpath = '/Users/excenity/Documents/HSIP/Research/Dissertation Project/Results/results_030425',
+    generateCohorts = T,
+    extractingData = T,
     runStatisticsAnalysis = T,
     runTreatmentEffects = F
 )
