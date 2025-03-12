@@ -16,9 +16,10 @@
 # 1789838: Sleep Apnea
 # 1789839: HF
 # 1789840: Hormonal Therapy
-# 1789831: Aldosteronism
 # 1789841: Statins
 # 1789842: PPI
+# 1791469: Hypercholesterolemia
+# 1791470: Hyperlipidemia
 
 # Concepts Sets
 # First-Line Drugs + Combo: 1884479

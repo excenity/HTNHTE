@@ -31,7 +31,6 @@ generateAnalyticDataset = function(
 
   headers = read.csv(system.file('omop_headers.csv', package = 'HTNHTE'))
   headersInData = dplyr::inner_join(headers, df_headers)
-  print('First Join completed')
 
   # restrict to columns in the csv file
   df <- df[,headersInData$columnId]
@@ -88,9 +87,8 @@ generateAnalyticDataset = function(
   remove(df_miss_outcome)
   sink()
 
+  ## Participant Exclusions + CONSORT list
   sink(file.path(outputpath, 'consort.txt'))
-
-  ## Exclusions
   print(paste('N Initial Dataset', nrow(df)))
   df = df %>% dplyr::filter(.data$age >= 18)
   print(paste('N after removing those under age 18:', nrow(df)))
@@ -162,6 +160,8 @@ generateAnalyticDataset = function(
 
   ## missingness visualizations and tables
 
+  df[col_repl] = sapply(df[col_repl], function(x) replace(x, x %in% c(0), NA))
+
   png(file.path(outputpath, 'missmap.png'), width = 800, height = 600)
   Amelia::missmap(df)
   dev.off()
@@ -199,7 +199,7 @@ generateAnalyticDataset = function(
   df$ldl[df$ldl == 0 ] = NA
   df$ldl[df$ldl > 250] = 250
   df$ldl[is.na(df$ldl)] = mean(df$ldl, na.rm = T)
-  df$hyperchold[df$ldd > 130] = 1
+  df$hyperchol[df$ldl > 130] = 1
 
   # normalization
   norm_vars = c('bmi', 'bmi_neg', 'hba1c')

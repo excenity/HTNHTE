@@ -44,9 +44,9 @@ executeStudy(
     cdmDatabaseSchema = 'htnhte',
     cohortDatabaseSchema = 'htnhte',
     cohortTable = 'htn_hte',
-    outputpath = '/Users/excenity/Documents/HSIP/Research/Dissertation Project/Results/results_030425',
-    generateCohorts = T,
-    extractingData = T,
+    outputpath = '/Users/excenity/Documents/HSIP/Research/Dissertation Project/Results/results_030725',
+    generateCohorts = F,
+    extractingData = F,
     runStatisticsAnalysis = T,
     runTreatmentEffects = F
 )
@@ -59,10 +59,9 @@ executeStudy(
 
 # STEP 3: Targeted Maximum Likelihood Estimation (TMLE) of Medication Treatment Effects within Different Patient Populations
 ```{r}
-cont_var = c('sbp', 'ldl', 'age', 'bmi')
+cont_var = c('sbp', 'age', 'bmi')
 
 cutpoints = list(c(0, 150, 300),
-                 c(0 ,100, 300),
                  c(0, 65, 150),
                  c(0, 30, 100))
 

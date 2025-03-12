@@ -43,7 +43,7 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
   set.seed(618)
 
   # prepare dataset
-  X = df %>% dplyr::select(c("age", "gender", "race", "hispanic", "dm", "ckd", "hf", "sleep_apnea", "antidepressants", "hormonal_therapy", "statins", "ppi", "dbp", "sbp", "chol", "ldl", "creatinine", "hba1c"))
+  X = df %>% dplyr::select(c("age", "gender", "dm", "ckd", "hf", "sleep_apnea", "antidepressants", "hormonal_therapy", "statins", "ppi", "dbp", "sbp", "hba1c"))
 
   if (outcome == 'at_control_14090')
   {
@@ -69,19 +69,6 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
     message('Removing columns: ', paste(colnames(X)[uniqueCount == 1], collapse = ' - '), ' as only have single value.')
     X <- X[, uniqueCount > 1]
   }
-
-  # # random forest
-  # RF.learners = SuperLearner::create.Learner("SL.ranger", tune = list(mtry = 3, num.trees = 500), detailed_names = T)
-  # # xgboost
-  # tune = list(ntrees = c(5, 10, 15),
-  #             max_depth = 2:5,
-  #             eta = c(0.1, 0.05, 0.01))
-  # xgboost.learners = SuperLearner::create.Learner("SL.xgboost", tune = tune, detailed_names = T, name_prefix = "xgb")
-  # # elastic net
-  # enet = SuperLearner::create.Learner("SL.glmnet", detailed_names = T, tune = list(alpha = seq(0, 1, length.out = 5)))
-  # # list libraries
-  # SL.library.chosen = c("SL.mean", "SL.glm", "SL.glm.interaction", RF.learners$names, xgboost.learners$names, enet$names)
-  # print(SL.library.chosen)
 
   # TMLE
   # there is a bug in tmle where IC.ATC is not defined
@@ -123,14 +110,13 @@ TMLE_analysis = function(
     htn_med_list
     )
 {
-
-
   for (med_class_i in 1:length(htn_med_list))
   {
     # create medication class specific dataset
     df_med = df
     df_med$htn_med_class[df_med$htn_med_class != htn_med_list[med_class_i]] = 'other'
     df_med$htn_med_class = factor(df_med$htn_med_class, levels = c('other', htn_med_list[med_class_i]))
+    print(paste('outcome:', outcome))
     print(paste('med_class:', htn_med_list[med_class_i]))
 
     for (patient_profile_i in 1:nrow(patient_profile_list))
