@@ -27,7 +27,6 @@ CF_analysis = function(ite, htn_med_class_i, df)
     dplyr::inner_join(df)
 
   # format all categorical variables
-  ite$race = as.numeric(factor(ite$race))
   ite[] = lapply(ite, as.numeric)
 
   X = ite %>% dplyr::select(-"pid", -"sbp_change", -"bmi_neg", -"bp_14090", -"bp_13080", -"ite", -"htn_med_class")

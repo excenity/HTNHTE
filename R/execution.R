@@ -76,6 +76,8 @@ executeStudy <- function(
       message('No data - please run with extractingData = T first')
     } else{
       df <- readRDS(file.path(outputpath, 'data.rds'))
+
+
       ## PART 1: Explore patient characteristics that contribute to HTE
       # STEP 1: Individual Treatment Effects (ITE) Estimation via G-estimation
       # STEP 2: Causal Forest to Identify Factors Contributing Most to Heterogeneity

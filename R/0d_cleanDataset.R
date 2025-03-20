@@ -188,18 +188,18 @@ generateAnalyticDataset = function(
 
   ## Lab Panel Assignment (Creatinine, Total Cholesterol, LDL-C)
 
-  # df$creatinine[df$creatinine == 0 | df$creatinine > 3] = NA
-  # df$creatinine[is.na(df$creatinine)] = mean(df$creatinine, na.rm = T)
+  if (sum(is.na(df$creatinine)> 0))
+  {
+    df$ckd[df$creatinine >= 1.2 & df$gender == 1] = 1
+    df$ckd[df$creatinine >= 1.0 & df$gender == 0] = 1
+  }
+  df = df %>% select(-creatinine)
 
-  df$chol[df$chol == 0 ] = NA
-  df$chol[df$chol > 400] = 400
-  df$chol[is.na(df$chol)] = mean(df$chol, na.rm = T)
-  df$hyperlipid[df$chol > 240] = 1
+  # create cholesterol related categories and remove the raw lab values
+  df$hyperlipid[df$chol >= 240] = 1
+  df$hyperchol[df$ldl >= 130] = 1
+  df = df %>% select(-chol, -ldl)
 
-  df$ldl[df$ldl == 0 ] = NA
-  df$ldl[df$ldl > 250] = 250
-  df$ldl[is.na(df$ldl)] = mean(df$ldl, na.rm = T)
-  df$hyperchol[df$ldl > 130] = 1
 
   # normalization
   norm_vars = c('bmi', 'bmi_neg', 'hba1c')
@@ -254,6 +254,9 @@ generateAnalyticDataset = function(
   t1 = tableone::CreateTableOne(data = df)
   print(t1)
   sink()
+
+  # remove race and ethnicity
+  df = df %>% dplyr::select(-race, -hispanic)
 
   return(df)
 }
