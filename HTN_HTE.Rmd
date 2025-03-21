@@ -46,8 +46,8 @@ executeStudy(
     cohortTable = 'htn_hte',
     outputpath = '/Users/excenity/Documents/HSIP/Research/Dissertation Project/Results/results_030725',
     generateCohorts = F,
-    extractingData = F,
-    runStatisticsAnalysis = T,
+    extractingData = T,
+    runStatisticsAnalysis = F,
     runTreatmentEffects = F
 )
 ```

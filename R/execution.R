@@ -136,6 +136,11 @@ executeStudy <- function(
     df = createPatientProfiles(cont_var, cutpoints, df)
     patient_profile_list = df %>% dplyr::distinct(patient_profiles)
 
+    sink(file.path(outputpath, 'patient_profile_table.txt'))
+    pp_table = table(df$patient_profiles)
+    print(pp_table)
+    sink()
+
     ### TMLE Analysis for Main Outcomes
     for(outcome in c('at_control_14090', 'at_control_13080','sbp_change')){
       result <- TMLE_analysis(

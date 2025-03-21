@@ -245,7 +245,8 @@ generateAnalyticDataset = function(
 
   ### Convert Data Types ###
 
-  factor_list = c('gender', 'race', 'hispanic', 'hf', 'dm', 'ckd', 'sleep_apnea',"antidepressants", "hormonal_therapy", "statins", "ppi")
+  factor_list = c('gender', 'race', 'hispanic', 'hf', 'dm', 'ckd', 'sleep_apnea',"antidepressants", "hormonal_therapy",
+                  "statins", "ppi", "hyperlipid", 'hyperchol', "bp_14090", "bp_13080")
   df = df %>% dplyr::mutate_at(factor_list, as.factor)
   df$htn_med_class = as.character(df$htn_med_class)
   df = df %>% dplyr::select(-c("sbp_6m", "dbp_6m"))
