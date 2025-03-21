@@ -137,7 +137,7 @@ executeStudy <- function(
     patient_profile_list = df %>% dplyr::distinct(patient_profiles)
 
     sink(file.path(outputpath, 'patient_profile_table.txt'))
-    pp_table = table(df$patient_profiles)
+    pp_table = table(df$patient_profiles, df$htn_med_class)
     print(pp_table)
     sink()
 
