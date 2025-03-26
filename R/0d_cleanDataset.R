@@ -252,7 +252,7 @@ generateAnalyticDataset = function(
   df = df %>% dplyr::select(-c("sbp_6m", "dbp_6m"))
 
   sink(file.path(outputpath, 'tableone.txt'))
-  t1 = tableone::CreateTableOne(data = df)
+  t1 = tableone::CreateTableOne(data = df, strata = 'htn_med_class', addOverall = T)
   print(t1)
   sink()
 
