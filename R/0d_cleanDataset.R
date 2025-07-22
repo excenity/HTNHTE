@@ -87,6 +87,31 @@ generateAnalyticDataset = function(
   remove(df_miss_outcome)
   sink()
 
+  ## Create IPCW for outcome at 6 months
+
+  ### create missing (censor) outcome
+  #### 0 indicates missing outcome and 1 indicates outcome available
+  df$sbp_6m[df$sbp_6m == 0] = NA
+  df$dbp_6m[df$dbp_6m == 0] = NA
+  df$miss_bp = 1
+  df$miss_bp[is.na(df$sbp_6m) | is.na(df$dbp_6m)] = 0
+  df$miss_bp = factor(df$miss_bp)
+
+  ### create logistic regression model
+  ipcw_model = glm(miss_bp ~ age + sbp + dbp + chol + ldl + bmi + hba1c + antidepressants + dm + ckd + sleep_apnea + hf + hormonal_therapy + statins + ppi + hyperlipid + hyperchol, data = df, family = 'binomial')
+  ipcw = predict(ipcw_model, df, type = 'response')
+  ipcw_limit = quantile(ipcw, probs = c(0.005, 0.995)) # truncating probs
+  ipcw[ipcw < ipcw_limit[1]] = ipcw_limit[1]
+  ipcw[ipcw > ipcw_limit[2]] = ipcw_limit[2]
+  ipcw = 1/ipcw
+
+  png(file.path(outputpath, 'ipcw.png'), width = 800, height = 600)
+  hist(ipcw)
+  dev.off()
+
+  df$ipcw = ipcw
+  df = df %>% select(-miss_bp)
+
   ## Participant Exclusions + CONSORT list
   sink(file.path(outputpath, 'consort.txt'))
   print(paste('N Initial Dataset', nrow(df)))
@@ -188,11 +213,11 @@ generateAnalyticDataset = function(
 
   ## Lab Panel Assignment (Creatinine, Total Cholesterol, LDL-C)
 
-  if (sum(is.na(df$creatinine)> 0))
-  {
-    df$ckd[df$creatinine >= 1.2 & df$gender == 1] = 1
-    df$ckd[df$creatinine >= 1.0 & df$gender == 0] = 1
-  }
+  # if (sum(is.na(df$creatinine)> 0))
+  # {
+  #   df$ckd[df$creatinine >= 1.2 & df$gender == 1] = 1
+  #   df$ckd[df$creatinine >= 1.0 & df$gender == 0] = 1
+  # }
   df = df %>% select(-creatinine)
 
   # create cholesterol related categories and remove the raw lab values
@@ -236,7 +261,7 @@ generateAnalyticDataset = function(
   # SBP change in 6 months
   df$sbp_change = df$sbp_6m - df$sbp
 
-  # BP Goals
+  # BP Goalsh
   df$bp_14090 = ifelse(df$sbp_6m < 140 & df$dbp_6m < 90, 1, 0)
   df$bp_13080 = ifelse(df$sbp_6m < 130 & df$dbp_6m < 80, 1, 0)
 

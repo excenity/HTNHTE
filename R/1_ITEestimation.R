@@ -37,13 +37,13 @@ step1_ite_SL = function(med_class_i, df, outcome)
   if (outcome == 'at_control_14090')
   {
     X = df_comp %>% dplyr::select(-"pid", -"sbp_change", -"bmi_neg", -"bp_14090", -"bp_13080")
-    y = df_comp$bp_14090
+    y = as.numeric(df_comp$bp_14090)-1
     SL.family = 'binomial'
     SL.method = 'method.AUC'
   } else if (outcome == 'at_control_13080')
   {
     X = df_comp %>% dplyr::select(-"pid", -"sbp_change", -"bmi_neg", -"bp_14090", -"bp_13080")
-    y = df_comp$bp_13080
+    y = as.numeric(df_comp$bp_13080)-1
     SL.family = 'binomial'
     SL.method = 'method.AUC'
   } else
@@ -67,6 +67,7 @@ step1_ite_SL = function(med_class_i, df, outcome)
                         SL.library = SL.library.chosen,
                         family = SL.family,
                         method = SL.method,
+                        obsWeights = df_comp$ipcw,
                         verbose = T)
 
   # obtain predictions
@@ -89,8 +90,9 @@ step1_ite_SL = function(med_class_i, df, outcome)
   pred_1 = stats::predict(fit.sl, newdata = X_1, onlySL = T)
 
   # calculate ite
-  ite = as.data.frame(pred_1$pred - pred_0$pred)
-  names(ite) = 'ite'
+  ite_calc = pred_1$pred - pred_0$pred
+  ite = data.frame('pred_1' = pred_1$pred,
+                      'ite' = ite_calc)
 
   # plot predicted potential outcome
   pred_0 = data.frame(pred = pred_0$pred)

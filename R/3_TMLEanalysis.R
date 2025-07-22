@@ -70,6 +70,10 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
     X <- X[, uniqueCount > 1]
   }
 
+
+  # # reformat variables
+  tmle_Y = as.numeric(tmle_Y) - 1
+
   # TMLE
   # there is a bug in tmle where IC.ATC is not defined
   #env <- environment(fun = tmle::tmle)
@@ -80,7 +84,9 @@ TMLE_patientProfile = function(df, outcome, intervention_levels)
                   Q.SL.library = SL.library.chosen,
                   g.SL.library = SL.library.chosen,
                   family = tmle_family,
-                  gbound = 0.05
+                  gbound = 0.05,
+                  obsWeights = df$ipcw_df
+
   )
 
   return(tmle_fit)
@@ -148,6 +154,8 @@ TMLE_analysis = function(
       {
         tmle_Y = df_pp$sbp_change
       }
+
+      tmle_Y = as.numeric(tmle_Y) - 1
 
       EIF_df = data.frame(
         Y = tmle_Y,

@@ -131,6 +131,7 @@ executeStudy <- function(
       message('No data - please run with extractingData = T first')
     } else {
       df <- readRDS(file.path(outputpath, 'data.rds'))
+      print('Running Step 3: TMLE')
 
     # create patient profiles
     df = createPatientProfiles(cont_var, cutpoints, df)
