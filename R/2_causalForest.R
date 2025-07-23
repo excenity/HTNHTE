@@ -22,14 +22,12 @@ CF_analysis = function(ite, htn_med_class_i, df)
   df$htn_med_class = factor(df$htn_med_class, levels = c('other', htn_med_class_i))
 
   # join dataset
-  ite = ite %>%
-    dplyr::rename(pid = "person_id_df") %>%
-    dplyr::inner_join(df)
+  ite = ite %>% rename('pid' = 'person_id_df') %>% left_join(df)
 
   # format all categorical variables
   ite[] = lapply(ite, as.numeric)
 
-  X = ite %>% dplyr::select(-"pid", -"sbp_change", -"bmi_neg", -"bp_14090", -"bp_13080", -"ite", -"htn_med_class")
+  X = ite %>% dplyr::select(-"pid", -"sbp_change", -"bmi_neg", -"bp_14090", -"bp_13080", -"ite", -"htn_med_class", -'pred_1', -'ipcw')
   X_headers = as.data.frame(names(X))
   X = as.matrix(X)
   Y = ite$ite

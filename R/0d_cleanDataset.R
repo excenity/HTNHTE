@@ -225,7 +225,6 @@ generateAnalyticDataset = function(
   df$hyperchol[df$ldl >= 130] = 1
   df = df %>% select(-chol, -ldl)
 
-
   # normalization
   norm_vars = c('bmi', 'bmi_neg', 'hba1c')
   norm_process = caret::preProcess(df %>% dplyr::select(norm_vars), method = 'range')
@@ -255,6 +254,11 @@ generateAnalyticDataset = function(
   mice_df = cbind(mice_df, norm_df)
 
   df = cbind(df %>% dplyr::select(c("pid")), mice_df)
+
+  ### clean up vitals and lab values
+  df$sbp[df$sbp > 200] = 200
+  df$dbp[df$dbp > 150] = 150
+  df$bmi[df$bmi > 80] = 80
 
   ### Outcome Determination ###
 

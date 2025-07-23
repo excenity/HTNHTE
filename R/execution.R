@@ -92,7 +92,7 @@ executeStudy <- function(
           ite <- step1_ite_SL(htnMedClass, df, type)
           write.csv(
             x = ite$ite,
-            file = file.path(outputpath,htnMedClass, type,'ite.csv')
+            file = file.path(outputpath, htnMedClass, type,'ite.csv'), row.names = F
           )
           ggplot2::ggsave(
             filename = file.path(outputpath,htnMedClass, type,'outcomesPredPlot.png'),
@@ -110,7 +110,8 @@ executeStudy <- function(
           cf <- CF_analysis(ite$ite, htnMedClass, df)
           write.csv(
             x = cf$splitValuesDf,
-            file = file.path(outputpath,htnMedClass, type,'splitValuesDf.csv')
+            file = file.path(outputpath,htnMedClass, type,'splitValuesDf.csv'),
+            row.names = F
           )
           # add split plot as multiple pdf?
           ggplot2::ggsave(

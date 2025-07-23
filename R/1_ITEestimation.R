@@ -23,9 +23,9 @@ step1_ite_SL = function(med_class_i, df, outcome)
                         tune = list(alpha = seq(0, 1, length.out = 5)))
 
   # xgboost
-  xg.tune = list(ntrees = c(5, 10, 15),
+  xg.tune = list(ntrees = c(5, 10, 20, 50),
                  max_depth = c(3, 5, 8),
-                 eta = c(0.05, 0.01))
+                 eta = c(0.1, 0.08, 0.05, 0.01))
   xgboost.learners = SuperLearner::create.Learner("SL.xgboost", tune = xg.tune, detailed_names = TRUE, name_prefix = "xgb")
 
   ## create med class comparisons
@@ -36,19 +36,19 @@ step1_ite_SL = function(med_class_i, df, outcome)
 
   if (outcome == 'at_control_14090')
   {
-    X = df_comp %>% dplyr::select(-"pid", -"sbp_change", -"bmi_neg", -"bp_14090", -"bp_13080")
+    X = df_comp %>% dplyr::select(-"pid", -"sbp_change", -"bmi_neg", -"bp_14090", -"bp_13080", -"ipcw")
     y = as.numeric(df_comp$bp_14090)-1
     SL.family = 'binomial'
     SL.method = 'method.AUC'
   } else if (outcome == 'at_control_13080')
   {
-    X = df_comp %>% dplyr::select(-"pid", -"sbp_change", -"bmi_neg", -"bp_14090", -"bp_13080")
+    X = df_comp %>% dplyr::select(-"pid", -"sbp_change", -"bmi_neg", -"bp_14090", -"bp_13080", -"ipcw")
     y = as.numeric(df_comp$bp_13080)-1
     SL.family = 'binomial'
     SL.method = 'method.AUC'
   } else
   {
-    X = df_comp %>% dplyr::select(-"pid", -"sbp_change", -"bmi_neg", -"bp_14090", -"bp_13080")
+    X = df_comp %>% dplyr::select(-"pid", -"sbp_change", -"bmi_neg", -"bp_14090", -"bp_13080", -"ipcw")
     y = df_comp$sbp_change
     SL.family = 'gaussian'
     SL.method = 'method.NNLS'
@@ -57,7 +57,7 @@ step1_ite_SL = function(med_class_i, df, outcome)
   # Choose Candidate Learners and CV Params
   set.seed(618)
 
-  SL.library.chosen = c("SL.mean", "SL.glm", "SL.glm.interaction", enet$names, xgboost.learners$names, "SL.ranger")
+  SL.library.chosen = c("SL.mean", "SL.glm", "SL.glm.interaction", enet$names, xgboost.learners$names)
   cvControl.chosen = list(V = 3)
 
   # fit SL model
